@@ -1,0 +1,13 @@
+{
+  "name": "inventario",
+  "version": "1.0.0",
+  "description": "Este es un sistema de inventario desarrollado con HTML, CSS, JavaScript, PHP y MySQL.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}
