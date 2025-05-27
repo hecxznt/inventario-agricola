@@ -1,3 +1,18 @@
+:root {
+    --primary-color: #2E7D32; /* Verde oscuro */
+    --secondary-color: #81C784; /* Verde claro */
+    --accent-color: #FFA000; /* Naranja/ámbar */
+    --background-color: #F1F8E9; /* Verde muy claro */
+    --text-color: #1B5E20; /* Verde oscuro para texto */
+    --border-color: #A5D6A7; /* Verde medio para bordes */
+}
+
+body {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    font-family: 'Roboto', sans-serif;
+}
+
 /* Estilos generales */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -12,20 +27,25 @@ body {
     z-index: 100;
     padding: 48px 0 0;
     box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+    background-color: var(--primary-color) !important;
+    color: white;
 }
 
 .sidebar .nav-link {
+    color: rgba(255, 255, 255, 0.8);
+    transition: all 0.3s;
     font-weight: 500;
-    color: #333;
     padding: 0.5rem 1rem;
 }
 
 .sidebar .nav-link:hover {
-    color: #007bff;
+    color: white;
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .sidebar .nav-link.active {
-    color: #007bff;
+    background-color: var(--secondary-color);
+    color: var(--text-color);
 }
 
 .sidebar .nav-link i {
@@ -44,4 +64,145 @@ main {
         height: auto;
         padding-top: 0;
     }
+}
+
+/* Estilo para las tarjetas */
+.card {
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    background-color: white;
+}
+
+.card-title {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+/* Estilo para los botones */
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover {
+    background-color: #1B5E20;
+    border-color: #1B5E20;
+}
+
+.btn-secondary {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #F57C00;
+    border-color: #F57C00;
+    color: white;
+}
+
+/* Estilo para la tabla */
+.table {
+    background-color: white;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.table thead {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.table-hover tbody tr:hover {
+    background-color: var(--background-color);
+}
+
+/* Estilo para los badges */
+.badge.bg-success {
+    background-color: var(--primary-color) !important;
+}
+
+.badge.bg-danger {
+    background-color: #C62828 !important;
+}
+
+/* Estilo para los inputs y selects */
+.form-control, .form-select {
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(46, 125, 50, 0.25);
+}
+
+/* Estilo para el modal */
+.modal-content {
+    border-radius: 10px;
+    border: none;
+}
+
+.modal-header {
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 10px 10px 0 0;
+}
+
+.modal-footer {
+    border-top: 1px solid var(--border-color);
+}
+
+/* Estilo para los iconos */
+.bi {
+    color: var(--primary-color);
+}
+
+/* Estilo para el título principal */
+.h2 {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+/* Estilo para los mensajes de alerta */
+.alert-success {
+    background-color: var(--secondary-color);
+    border-color: var(--primary-color);
+    color: var(--text-color);
+}
+
+.alert-danger {
+    background-color: #FFCDD2;
+    border-color: #C62828;
+    color: #C62828;
+}
+
+/* Estilo para el input group */
+.input-group-text {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+}
+
+/* Estilo para el botón de búsqueda */
+#btnBuscar {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+}
+
+#btnBuscar:hover {
+    background-color: #F57C00;
+    border-color: #F57C00;
+}
+
+/* Estilo para el botón de nuevo producto */
+[data-bs-target="#nuevoProductoModal"] {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+[data-bs-target="#nuevoProductoModal"]:hover {
+    background-color: #1B5E20;
+    border-color: #1B5E20;
 } 
