@@ -19,6 +19,17 @@ $(document).ready(function() {
                 proveedor: $('#proveedor').val()
             };
 
+            // Validar fecha de caducidad
+            let fechaCaducidad = productoData.fechaCaducidad;
+            if (fechaCaducidad) {
+                let fechaActual = new Date();
+                let fechaSeleccionada = new Date(fechaCaducidad);
+                if (fechaSeleccionada < fechaActual) {
+                    mostrarAlerta('La fecha de caducidad no puede ser anterior a la fecha actual', 'danger');
+                    return;
+                }
+            }
+
             // Enviar datos al servidor
             guardarProducto(productoData);
         } else {
@@ -61,6 +72,8 @@ function guardarProducto(productoData) {
         data: productoData,
         dataType: 'json',
         success: function(response) {
+            console.log('Respuesta del servidor:', response);
+            
             if (response.success) {
                 // Cerrar el modal
                 $('#nuevoProductoModal').modal('hide');
@@ -74,19 +87,46 @@ function guardarProducto(productoData) {
                 // Recargar la tabla de productos
                 cargarProductos();
             } else {
+                // Mostrar mensaje de error
                 alert(response.message || 'Error al guardar el producto');
             }
         },
         error: function(xhr, status, error) {
-            console.error('Error al guardar el producto:', error);
+            console.log('Error completo:', xhr.responseText);
             let mensaje = 'Error al guardar el producto';
+            
             try {
                 const response = JSON.parse(xhr.responseText);
-                mensaje = response.message || mensaje;
-            } catch(e) {}
+                if (response && response.message) {
+                    mensaje = response.message;
+                }
+            } catch(e) {
+                console.error('Error al parsear la respuesta:', e);
+            }
+            
             alert(mensaje);
         }
     });
+}
+
+function mostrarAlerta(mensaje, tipo) {
+    if (tipo === 'danger') {
+        // Mostrar error en el modal
+        $('#errorMessage').text(mensaje);
+        $('#errorModal').modal('show');
+    } else {
+        // Mostrar éxito como alerta normal
+        let alerta = `
+            <div class="alert alert-${tipo} alert-dismissible fade show" role="alert">
+                ${mensaje}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        `;
+        $('.content').prepend(alerta);
+        setTimeout(function() {
+            $('.alert').alert('close');
+        }, 5000);
+    }
 }
 
 // Función para buscar productos

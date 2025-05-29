@@ -10,50 +10,7 @@ require_once '../../php/config.php';
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="../../css/styles.css">
-    <style>
-        body {
-            background-color: #F1F8E9;
-        }
-        .sidebar {
-            background-color: #2E7D32 !important;
-        }
-        .card {
-            border: none;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            border-radius: 10px;
-        }
-        .table thead {
-            background-color: #2E7D32;
-            color: white;
-        }
-        .btn-primary {
-            background-color: #2E7D32;
-            border-color: #2E7D32;
-        }
-        .btn-primary:hover {
-            background-color: #1B5E20;
-            border-color: #1B5E20;
-        }
-        .btn-secondary {
-            background-color: #FFA000;
-            border-color: #FFA000;
-        }
-        .btn-secondary:hover {
-            background-color: #F57C00;
-            border-color: #F57C00;
-        }
-        .modal-header {
-            background-color: #2E7D32;
-            color: white;
-        }
-        .badge.bg-success {
-            background-color: #2E7D32 !important;
-        }
-        .badge.bg-danger {
-            background-color: #C62828 !important;
-        }
-    </style>
+    <link rel="stylesheet" href="/inventario/css/styles.css?v=1.0">
 </head>
 <body>
     <div class="container-fluid">
@@ -63,12 +20,12 @@ require_once '../../php/config.php';
                 <div class="position-sticky pt-3">
                     <ul class="nav flex-column">
                         <li class="nav-item">
-                            <a class="nav-link active" href="#">
+                            <a class="nav-link active" href="../productos/index.php">
                                 <i class="bi bi-box-seam"></i> Productos
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">
+                            <a class="nav-link" href="../movimientos/index.php">
                                 <i class="bi bi-arrow-left-right"></i> Movimientos
                             </a>
                         </li>
@@ -248,7 +205,7 @@ require_once '../../php/config.php';
                             </div>
                             <div class="col-md-6">
                                 <label for="fechaCaducidad" class="form-label">Fecha Caducidad</label>
-                                <input type="date" class="form-control" id="fechaCaducidad">
+                                <input type="date" class="form-control" id="fechaCaducidad" min="<?php echo date('Y-m-d'); ?>">
                             </div>
                         </div>
                         <div class="row mb-3">
@@ -263,7 +220,12 @@ require_once '../../php/config.php';
                             </div>
                             <div class="col-md-6">
                                 <label for="proveedor" class="form-label">Proveedor</label>
-                                <input type="text" class="form-control" id="proveedor">
+                                <select class="form-select" id="proveedor">
+                                    <option value="">Seleccione un proveedor</option>
+                                    <option value="proveedor1">Proveedor 1</option>
+                                    <option value="proveedor2">Proveedor 2</option>
+                                    <option value="proveedor3">Proveedor 3</option>
+                                </select>
                             </div>
                         </div>
                     </form>
@@ -271,6 +233,24 @@ require_once '../../php/config.php';
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                     <button type="button" class="btn btn-primary" id="btnGuardarProducto">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Error -->
+    <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="errorModalLabel">Error</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="errorMessage"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                 </div>
             </div>
         </div>
