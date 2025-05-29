@@ -121,7 +121,7 @@ require_once '../../php/config.php';
                                             <td><?php echo number_format($row['cantidad'], 2); ?></td>
                                             <td><?php echo htmlspecialchars($row['motivo']); ?></td>
                                             <td>
-                                                <button type="button" class="btn btn-sm btn-info" onclick="verHistorial(<?php echo $row['id_producto']; ?>)">
+                                                <button type="button" class="btn btn-sm btn-info btn-historial" data-id="<?php echo $row['id_producto']; ?>">
                                                     <i class="bi bi-clock-history"></i> Historial
                                                 </button>
                                             </td>
@@ -157,7 +157,7 @@ require_once '../../php/config.php';
 
     <!-- Modal para Nuevo Movimiento -->
     <div class="modal fade" id="nuevoMovimientoModal" tabindex="-1">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Nuevo Movimiento</h5>
@@ -165,17 +165,27 @@ require_once '../../php/config.php';
                 </div>
                 <div class="modal-body">
                     <form id="formMovimiento">
-                        <div class="mb-3">
-                            <label class="form-label">Producto</label>
-                            <select class="form-select" name="id_producto" required>
+                        <!-- Campo oculto para el ID del producto -->
+                        <input type="hidden" name="id_producto" id="id_producto">
+                        
+                        <!-- Selector de Producto -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Producto</label>
+                            <select class="form-select" id="selectProducto" name="select_producto" required>
                                 <option value="">Seleccione un producto</option>
                                 <?php
                                 try {
-                                    $stmt = $conn->query("SELECT id_producto, nombre, stock_actual FROM productos ORDER BY nombre");
+                                    $stmt = $conn->query("SELECT id_producto, nombre, stock_actual 
+                                                        FROM productos 
+                                                        ORDER BY nombre");
                                     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                                        echo '<option value="' . $row['id_producto'] . '">' . 
-                                             htmlspecialchars($row['nombre']) . 
-                                             ' (Stock: ' . number_format($row['stock_actual'], 2) . ')</option>';
+                                        echo sprintf(
+                                            '<option value="%d" data-stock="%f">%s (Stock: %s)</option>',
+                                            $row['id_producto'],
+                                            $row['stock_actual'],
+                                            htmlspecialchars($row['nombre']),
+                                            number_format($row['stock_actual'], 2)
+                                        );
                                     }
                                 } catch(PDOException $e) {
                                     echo '<option value="">Error al cargar productos</option>';
@@ -183,15 +193,78 @@ require_once '../../php/config.php';
                                 ?>
                             </select>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Tipo de Movimiento</label>
-                            <select class="form-select" name="tipo_movimiento" required>
-                                <option value="">Seleccione un tipo</option>
-                                <option value="entrada">Entrada</option>
-                                <option value="salida">Salida</option>
-                                <option value="transferencia">Transferencia</option>
-                            </select>
+
+                        <!-- Tipo de Movimiento -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Tipo de Movimiento</label>
+                            <div class="btn-group w-100" role="group">
+                                <input type="radio" class="btn-check" name="tipo_movimiento" id="tipoEntrada" value="entrada" autocomplete="off">
+                                <label class="btn btn-outline-success" for="tipoEntrada">Entrada</label>
+
+                                <input type="radio" class="btn-check" name="tipo_movimiento" id="tipoSalida" value="salida" autocomplete="off">
+                                <label class="btn btn-outline-danger" for="tipoSalida">Salida</label>
+
+                                <input type="radio" class="btn-check" name="tipo_movimiento" id="tipoTransferencia" value="transferencia" autocomplete="off">
+                                <label class="btn btn-outline-warning" for="tipoTransferencia">Transferencia</label>
+                            </div>
                         </div>
+
+                        <!-- Campos para Entrada -->
+                        <div id="camposEntrada" style="display: none;">
+                            <div class="mb-3">
+                                <label class="form-label">Proveedor</label>
+                                <select class="form-select" name="proveedor">
+                                    <option value="">Seleccione un proveedor</option>
+                                    <option value="1">Proveedor 1</option>
+                                    <option value="2">Proveedor 2</option>
+                                    <option value="3">Proveedor 3</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Monto</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="text" class="form-control" name="monto" placeholder="0.00">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Campos para Salida -->
+                        <div id="camposSalida" style="display: none;">
+                            <div class="mb-3">
+                                <label class="form-label">Parcela</label>
+                                <select class="form-select" name="parcela">
+                                    <option value="">Seleccione una parcela</option>
+                                    <option value="1">Parcela 1</option>
+                                    <option value="2">Parcela 2</option>
+                                    <option value="3">Parcela 3</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Trabajador</label>
+                                <select class="form-select" name="trabajador">
+                                    <option value="">Seleccione un trabajador</option>
+                                    <option value="1">Trabajador 1</option>
+                                    <option value="2">Trabajador 2</option>
+                                    <option value="3">Trabajador 3</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Campos para Transferencia -->
+                        <div id="camposTransferencia" style="display: none;">
+                            <div class="mb-3">
+                                <label class="form-label">Destino</label>
+                                <select class="form-select" name="destino">
+                                    <option value="">Seleccione un destino</option>
+                                    <option value="1">Almacén Principal</option>
+                                    <option value="2">Almacén Secundario</option>
+                                    <option value="3">Bodega</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Campos Comunes -->
                         <div class="mb-3">
                             <label class="form-label">Cantidad</label>
                             <input type="number" class="form-control" name="cantidad" step="0.01" min="0.01" required>
@@ -210,57 +283,47 @@ require_once '../../php/config.php';
         </div>
     </div>
 
+    <!-- Scripts -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-    function verHistorial(idProducto) {
-        // Mostrar el modal
-        const modal = new bootstrap.Modal(document.getElementById('historialModal'));
-        modal.show();
+        // Definir la ruta base para las llamadas AJAX
+        const BASE_URL = window.location.pathname.substring(0, window.location.pathname.indexOf('/secciones/movimientos/'));
         
-        // Cargar el historial
-        $.ajax({
-            url: 'obtener_historial.php',
-            type: 'POST',
-            data: { id_producto: idProducto },
-            success: function(response) {
-                $('#historialContenido').html(response);
-            },
-            error: function() {
-                $('#historialContenido').html('<div class="alert alert-danger">Error al cargar el historial</div>');
+        // Verificar que jQuery está cargado
+        console.log('jQuery version:', $.fn.jquery);
+        
+        // Verificar que Bootstrap está cargado
+        console.log('Bootstrap Modal:', typeof bootstrap.Modal);
+    </script>
+    <script src="../../js/movimientos.js?v=<?php echo time(); ?>"></script>
+    <script>
+        // Verificar que las funciones están disponibles
+        console.log('verHistorial disponible:', typeof verHistorial);
+        console.log('guardarMovimiento disponible:', typeof guardarMovimiento);
+        
+        // Agregar evento al botón de nuevo movimiento
+        document.addEventListener('DOMContentLoaded', function() {
+            const btnNuevoMovimiento = document.querySelector('[data-bs-target="#nuevoMovimientoModal"]');
+            if (btnNuevoMovimiento) {
+                btnNuevoMovimiento.addEventListener('click', function() {
+                    console.log('Botón de nuevo movimiento clickeado');
+                    const modal = new bootstrap.Modal(document.getElementById('nuevoMovimientoModal'));
+                    modal.show();
+                });
             }
         });
-    }
 
-    function guardarMovimiento() {
-        const form = document.getElementById('formMovimiento');
-        if (!form.checkValidity()) {
-            form.reportValidity();
-            return;
-        }
-
-        const formData = new FormData(form);
-        formData.append('id_trabajador', 1); // Por ahora usamos un ID fijo
-
-        $.ajax({
-            url: 'guardar.php',
-            type: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            success: function(response) {
-                if (response.success) {
-                    alert(response.message);
-                    location.reload();
-                } else {
-                    alert(response.message);
-                }
-            },
-            error: function() {
-                alert('Error al guardar el movimiento');
-            }
+        // Agregar evento a los botones de historial
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.btn-historial').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const idProducto = this.getAttribute('data-id');
+                    console.log('Ver historial para producto:', idProducto);
+                    verHistorial(idProducto);
+                });
+            });
         });
-    }
     </script>
 </body>
 </html> 
