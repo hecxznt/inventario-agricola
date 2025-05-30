@@ -1,75 +1,74 @@
 <?php
 require_once '../../php/config.php';
 
-if (!isset($_POST['id_producto'])) {
-    echo '<div class="alert alert-danger">ID de producto no especificado</div>';
-    exit;
-}
-
-$id_producto = $_POST['id_producto'];
-
 try {
-    // Obtener información del producto
-    $stmt = $conn->prepare("SELECT nombre, stock_actual FROM productos WHERE id_producto = ?");
-    $stmt->execute([$id_producto]);
-    $producto = $stmt->fetch(PDO::FETCH_ASSOC);
+    $sql = "SELECT m.*, p.nombre as producto_nombre, p.stock_actual
+            FROM movimientos m 
+            LEFT JOIN productos p ON m.id_producto = p.id_producto";
+    
+    $params = [];
+    $where = [];
 
-    if (!$producto) {
-        echo '<div class="alert alert-danger">Producto no encontrado</div>';
-        exit;
+    // Filtrar por fecha desde
+    if (isset($_GET['fecha_desde']) && !empty($_GET['fecha_desde'])) {
+        $where[] = "DATE(m.fecha) >= ?";
+        $params[] = $_GET['fecha_desde'];
     }
 
-    // Obtener historial de movimientos
-    $stmt = $conn->prepare("SELECT m.*, p.nombre as producto_nombre 
-                           FROM movimientos m 
-                           LEFT JOIN productos p ON m.id_producto = p.id_producto 
-                           WHERE m.id_producto = ? 
-                           ORDER BY m.fecha DESC");
-    $stmt->execute([$id_producto]);
-    $movimientos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    // Filtrar por fecha hasta
+    if (isset($_GET['fecha_hasta']) && !empty($_GET['fecha_hasta'])) {
+        $where[] = "DATE(m.fecha) <= ?";
+        $params[] = $_GET['fecha_hasta'];
+    }
 
-    // Mostrar información del producto
-    echo '<div class="mb-4">';
-    echo '<h4>' . htmlspecialchars($producto['nombre']) . '</h4>';
-    echo '<p>Stock Actual: <strong>' . number_format($producto['stock_actual'], 2) . '</strong></p>';
-    echo '</div>';
+    // Agregar condiciones WHERE si existen
+    if (!empty($where)) {
+        $sql .= " WHERE " . implode(" AND ", $where);
+    }
 
-    // Mostrar tabla de movimientos
-    echo '<div class="table-responsive">';
-    echo '<table class="table table-sm table-striped">';
-    echo '<thead><tr>';
-    echo '<th>Fecha</th>';
-    echo '<th>Tipo</th>';
-    echo '<th>Cantidad</th>';
-    echo '<th>Motivo</th>';
-    echo '</tr></thead><tbody>';
+    // Ordenar por fecha descendente
+    $sql .= " ORDER BY m.fecha DESC";
 
-    foreach ($movimientos as $mov) {
-        $tipoClass = '';
-        switch(strtolower($mov['tipo_movimiento'])) {
-            case 'entrada':
-                $tipoClass = 'text-success';
-                break;
-            case 'salida':
-                $tipoClass = 'text-danger';
-                break;
-            case 'transferencia':
-                $tipoClass = 'text-warning';
-                break;
+    $stmt = $conn->prepare($sql);
+    $stmt->execute($params);
+    
+    if ($stmt->rowCount() > 0) {
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $fecha = date('d/m/Y H:i', strtotime($row['fecha']));
+            $tipoClass = '';
+            switch(strtolower($row['tipo_movimiento'])) {
+                case 'entrada':
+                    $tipoClass = 'text-success';
+                    break;
+                case 'salida':
+                    $tipoClass = 'text-danger';
+                    break;
+            }
+            
+            // Calcular la cantidad anterior correctamente
+            $cantidad_anterior = $row['tipo_movimiento'] === 'entrada' 
+                ? $row['stock_actual'] - $row['cantidad']  // Si es entrada, restamos la cantidad que entró
+                : $row['stock_actual'] + $row['cantidad']; // Si es salida, sumamos la cantidad que salió
+            
+            echo '<tr>';
+            echo '<td>' . $fecha . '</td>';
+            echo '<td>' . htmlspecialchars($row['producto_nombre']) . '</td>';
+            echo '<td><span class="' . $tipoClass . '">' . ucfirst($row['tipo_movimiento']) . '</span></td>';
+            echo '<td>' . number_format($cantidad_anterior, 2) . '</td>';
+            echo '<td>' . number_format($row['cantidad'], 2) . '</td>';
+            echo '<td>' . number_format($row['stock_actual'], 2) . '</td>';
+            echo '<td>' . htmlspecialchars($row['motivo']) . '</td>';
+            echo '<td>';
+            echo '<button type="button" class="btn btn-sm btn-danger" onclick="eliminarMovimiento(' . $row['id_movimiento'] . ')">';
+            echo '<i class="bi bi-trash"></i>';
+            echo '</button>';
+            echo '</td>';
+            echo '</tr>';
         }
-
-        echo '<tr>';
-        echo '<td>' . date('d/m/Y H:i', strtotime($mov['fecha'])) . '</td>';
-        echo '<td><span class="' . $tipoClass . '">' . ucfirst($mov['tipo_movimiento']) . '</span></td>';
-        echo '<td>' . number_format($mov['cantidad'], 2) . '</td>';
-        echo '<td>' . htmlspecialchars($mov['motivo']) . '</td>';
-        echo '</tr>';
+    } else {
+        echo '<tr><td colspan="8" class="text-center">No hay movimientos registrados</td></tr>';
     }
-
-    echo '</tbody></table>';
-    echo '</div>';
-
 } catch(PDOException $e) {
-    echo '<div class="alert alert-danger">Error al cargar el historial: ' . $e->getMessage() . '</div>';
+    echo '<tr><td colspan="8" class="text-center text-danger">Error al cargar los movimientos: ' . $e->getMessage() . '</td></tr>';
 }
 ?> 

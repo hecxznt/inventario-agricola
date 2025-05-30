@@ -6,6 +6,20 @@ $(document).ready(function() {
         
         // Validar el formulario
         if (form[0].checkValidity()) {
+            // Validar stock mínimo
+            const stockMinimo = parseInt($('#stockMinimo').val());
+            if (stockMinimo < 10) {
+                mostrarAlerta('El stock mínimo debe ser de 10 unidades o más', 'danger');
+                return;
+            }
+
+            // Validar cantidad
+            const cantidad = parseInt($('#cantidad').val());
+            if (cantidad < 10) {
+                mostrarAlerta('La cantidad debe ser de 10 unidades o más', 'danger');
+                return;
+            }
+
             // Recopilar datos del formulario
             const productoData = {
                 id: $('#productoId').val(),
@@ -62,6 +76,11 @@ $(document).ready(function() {
         // Realizar la búsqueda
         buscarProductos(criteriosBusqueda);
     });
+
+    actualizarTabla();
+    
+    // Actualizar tabla cada 30 segundos
+    setInterval(actualizarTabla, 30000);
 });
 
 // Función para guardar un nuevo producto
@@ -223,6 +242,19 @@ function cargarProductos() {
             console.error('Error al cargar los productos:', error);
             console.error('Respuesta del servidor:', xhr.responseText);
             alert('Error al cargar los productos. Por favor, recargue la página.');
+        }
+    });
+}
+
+function actualizarTabla() {
+    $.ajax({
+        url: '../php/obtener_productos.php',
+        type: 'GET',
+        success: function(response) {
+            $('tbody').html(response);
+        },
+        error: function() {
+            alert('Error al cargar los productos');
         }
     });
 } 

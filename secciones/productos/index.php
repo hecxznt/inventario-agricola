@@ -55,7 +55,7 @@ require_once '../../php/config.php';
                                         <option value="">Categoría</option>
                                         <option value="herramientas">Herramientas</option>
                                         <option value="insumos">Insumos</option>
-                                        <option value="implementacion">Implementación</option>
+                                        <option value="implemento">Implemento</option>
                                     </select>
                                     <select class="form-select" style="max-width: 200px;" id="buscarLugar">
                                         <option value="">Lugar</option>
@@ -80,6 +80,7 @@ require_once '../../php/config.php';
                                     <th>Nombre</th>
                                     <th>Categoría</th>
                                     <th>Presentación</th>
+                                    <th>Stock Actual</th>
                                     <th>Stock Mínimo</th>
                                     <th>Fecha Caducidad</th>
                                     <th>Ubicación</th>
@@ -119,6 +120,7 @@ require_once '../../php/config.php';
                                             <td><?php echo htmlspecialchars($row['nombre']); ?></td>
                                             <td><?php echo htmlspecialchars($row['categoria']); ?></td>
                                             <td><?php echo htmlspecialchars($presentacion); ?></td>
+                                            <td><?php echo !empty($row['stock_actual']) ? number_format(floatval($row['stock_actual']), 2) : '0.00'; ?></td>
                                             <td><?php echo intval($row['stock_minimo']); ?></td>
                                             <td><?php echo $fechaCaducidad; ?></td>
                                             <td><?php echo htmlspecialchars($row['ubicacion']); ?></td>
@@ -145,7 +147,7 @@ require_once '../../php/config.php';
                                         <?php
                                     }
                                 } catch(PDOException $e) {
-                                    echo '<tr><td colspan="9" class="text-center text-danger">Error al cargar los productos: ' . $e->getMessage() . '</td></tr>';
+                                    echo '<tr><td colspan="10" class="text-center text-danger">Error al cargar los productos: ' . $e->getMessage() . '</td></tr>';
                                 }
                                 ?>
                             </tbody>
@@ -178,7 +180,7 @@ require_once '../../php/config.php';
                                     <option value="">Seleccione una categoría</option>
                                     <option value="herramientas">Herramientas</option>
                                     <option value="insumos">Insumos</option>
-                                    <option value="implementacion">Implementación</option>
+                                    <option value="implemento">Implemento</option>
                                 </select>
                             </div>
                         </div>
@@ -195,13 +197,13 @@ require_once '../../php/config.php';
                             </div>
                             <div class="col-md-6">
                                 <label for="cantidad" class="form-label">Cantidad</label>
-                                <input type="number" class="form-control" id="cantidad" required min="1" placeholder="Ej: 5 cajas, 10 kg, etc.">
+                                <input type="number" class="form-control" id="cantidad" required min="10" value="10" placeholder="Ej: 5 cajas, 10 kg, etc.">
                             </div>
                         </div>
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="stockMinimo" class="form-label">Stock Mínimo</label>
-                                <input type="number" class="form-control" id="stockMinimo" required min="0">
+                                <input type="number" class="form-control" id="stockMinimo" required min="10" value="10">
                             </div>
                             <div class="col-md-6">
                                 <label for="fechaCaducidad" class="form-label">Fecha Caducidad</label>
