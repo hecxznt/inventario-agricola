@@ -2,7 +2,7 @@
 require_once '../../php/config.php';
 
 try {
-    $sql = "SELECT m.*, p.nombre as producto_nombre, p.stock_actual
+    $sql = "SELECT m.*, p.nombre as producto_nombre
             FROM movimientos m 
             LEFT JOIN productos p ON m.id_producto = p.id_producto";
     
@@ -45,18 +45,13 @@ try {
                     break;
             }
             
-            // Calcular la cantidad anterior correctamente
-            $cantidad_anterior = $row['tipo_movimiento'] === 'entrada' 
-                ? $row['stock_actual'] - $row['cantidad']  // Si es entrada, restamos la cantidad que entró
-                : $row['stock_actual'] + $row['cantidad']; // Si es salida, sumamos la cantidad que salió
-            
             echo '<tr>';
             echo '<td>' . $fecha . '</td>';
             echo '<td>' . htmlspecialchars($row['producto_nombre']) . '</td>';
             echo '<td><span class="' . $tipoClass . '">' . ucfirst($row['tipo_movimiento']) . '</span></td>';
-            echo '<td>' . number_format($cantidad_anterior, 2) . '</td>';
+            echo '<td>' . number_format($row['stock_anterior'], 2) . '</td>';
             echo '<td>' . number_format($row['cantidad'], 2) . '</td>';
-            echo '<td>' . number_format($row['stock_actual'], 2) . '</td>';
+            echo '<td>' . number_format($row['stock_posterior'], 2) . '</td>';
             echo '<td>' . htmlspecialchars($row['motivo']) . '</td>';
             echo '<td>';
             echo '<button type="button" class="btn btn-sm btn-danger" onclick="eliminarMovimiento(' . $row['id_movimiento'] . ')">';

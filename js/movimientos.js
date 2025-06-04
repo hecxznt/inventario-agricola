@@ -53,8 +53,9 @@ function mostrarCamposAdicionales() {
 
 function cargarProductos() {
     $.ajax({
-        url: '/inventario/php/obtener_productos.php',
+        url: '../../secciones/productos/listar.php',
         type: 'GET',
+        data: { selector: true },
         success: function(response) {
             if (response.success) {
                 let options = '<option value="">Seleccione un producto</option>';
@@ -66,7 +67,9 @@ function cargarProductos() {
                 alert('Error al cargar productos: ' + response.message);
             }
         },
-        error: function() {
+        error: function(xhr, status, error) {
+            console.error('Error al cargar productos:', error);
+            console.error('Respuesta del servidor:', xhr.responseText);
             alert('Error al cargar productos');
         }
     });
@@ -77,7 +80,7 @@ function cargarMovimientos() {
     const fechaHasta = $('#fechaHasta').val();
 
     $.ajax({
-        url: '/inventario/secciones/movimientos/obtener_historial.php',
+        url: '../../secciones/movimientos/obtener_historial.php',
         type: 'GET',
         data: {
             fecha_desde: fechaDesde,
@@ -86,7 +89,9 @@ function cargarMovimientos() {
         success: function(response) {
             $('tbody').html(response);
         },
-        error: function() {
+        error: function(xhr, status, error) {
+            console.error('Error al cargar movimientos:', error);
+            console.error('Respuesta del servidor:', xhr.responseText);
             alert('Error al cargar movimientos');
         }
     });
@@ -126,7 +131,7 @@ function guardarMovimiento() {
     }
 
     $.ajax({
-        url: '/inventario/secciones/movimientos/guardar.php',
+        url: '../../secciones/movimientos/guardar.php',
         type: 'POST',
         data: datos,
         success: function(response) {
@@ -145,7 +150,9 @@ function guardarMovimiento() {
                 alert('Error al guardar movimiento: ' + response.message);
             }
         },
-        error: function() {
+        error: function(xhr, status, error) {
+            console.error('Error al guardar movimiento:', error);
+            console.error('Respuesta del servidor:', xhr.responseText);
             alert('Error al guardar movimiento');
         }
     });
@@ -157,7 +164,7 @@ function eliminarMovimiento(id_movimiento) {
     }
 
     $.ajax({
-        url: '/inventario/secciones/movimientos/eliminar.php',
+        url: '../../secciones/movimientos/eliminar.php',
         type: 'POST',
         data: { id_movimiento: id_movimiento },
         success: function(response) {
@@ -168,7 +175,9 @@ function eliminarMovimiento(id_movimiento) {
                 alert('Error al eliminar movimiento: ' + response.message);
             }
         },
-        error: function() {
+        error: function(xhr, status, error) {
+            console.error('Error al eliminar movimiento:', error);
+            console.error('Respuesta del servidor:', xhr.responseText);
             alert('Error al eliminar movimiento');
         }
     });

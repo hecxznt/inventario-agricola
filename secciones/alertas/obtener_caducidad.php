@@ -2,11 +2,11 @@
 require_once '../../php/config.php';
 
 try {
-    // Obtener productos que caducan en los próximos 30 días
+    // Obtener productos que caducan en los próximos 10 días
     $sql = "SELECT id_producto, nombre, fecha_caducidad 
             FROM productos 
             WHERE fecha_caducidad IS NOT NULL 
-            AND fecha_caducidad BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 30 DAY)
+            AND fecha_caducidad BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 10 DAY)
             ORDER BY fecha_caducidad ASC";
     
     $stmt = $conn->query($sql);
@@ -17,23 +17,11 @@ try {
             $hoy = new DateTime();
             $dias_restantes = $hoy->diff($fecha_caducidad)->days;
             
-            // Determinar el estado y la clase CSS
-            if ($dias_restantes <= 7) {
-                $estado = 'Crítico';
-                $clase = 'danger';
-            } elseif ($dias_restantes <= 15) {
-                $estado = 'Próximo';
-                $clase = 'warning';
-            } else {
-                $estado = 'Normal';
-                $clase = 'info';
-            }
-            
             echo '<tr>';
             echo '<td>' . htmlspecialchars($row['nombre']) . '</td>';
             echo '<td>' . date('d/m/Y', strtotime($row['fecha_caducidad'])) . '</td>';
             echo '<td>' . $dias_restantes . ' días</td>';
-            echo '<td><span class="badge bg-' . $clase . '">' . $estado . '</span></td>';
+            echo '<td><span class="badge bg-danger">Crítico</span></td>';
             echo '</tr>';
         }
     } else {

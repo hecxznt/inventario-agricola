@@ -248,13 +248,15 @@ function cargarProductos() {
 
 function actualizarTabla() {
     $.ajax({
-        url: '../php/obtener_productos.php',
+        url: '../../secciones/productos/listar.php',
         type: 'GET',
         success: function(response) {
-            $('tbody').html(response);
+            $('.table-responsive').html(response);
         },
-        error: function() {
-            alert('Error al cargar los productos');
+        error: function(xhr, status, error) {
+            console.error('Error al cargar los productos:', error);
+            console.error('Respuesta del servidor:', xhr.responseText);
+            alert('Error al cargar los productos. Por favor, recargue la página.');
         }
     });
 } 

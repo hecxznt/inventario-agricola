@@ -33,12 +33,21 @@ try {
         exit;
     }
 
+    // Obtener stock actual del producto
+    $stmt = $conn->prepare("SELECT cantidad, stock_minimo FROM productos WHERE id_producto = ?");
+    $stmt->execute([$id_producto]);
+    $producto = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if (!$producto) {
+        echo json_encode(['success' => false, 'message' => 'Producto no encontrado']);
+        exit;
+    }
+    
+    $stock_anterior = floatval($producto['cantidad']);
+    $stock_posterior = $stock_anterior;
+
     // Verificar stock actual si es una salida
     if ($tipo_movimiento === 'salida') {
-        $stmt = $conn->prepare("SELECT stock_actual, stock_minimo FROM productos WHERE id_producto = ?");
-        $stmt->execute([$id_producto]);
-        $producto = $stmt->fetch(PDO::FETCH_ASSOC);
-        
         // Verificar si el stock mínimo es menor a 10
         if ($producto['stock_minimo'] < 10) {
             echo json_encode(['success' => false, 'message' => 'El stock mínimo del producto debe ser de 10 unidades o más']);
@@ -46,16 +55,20 @@ try {
         }
         
         // Verificar si hay suficiente stock
-        if ($producto['stock_actual'] < $cantidad) {
-            echo json_encode(['success' => false, 'message' => 'No hay suficiente stock. Stock actual: ' . $producto['stock_actual']]);
+        if ($stock_anterior < $cantidad) {
+            echo json_encode(['success' => false, 'message' => 'No hay suficiente stock. Stock actual: ' . $stock_anterior]);
             exit;
         }
         
         // Verificar si después de la salida quedaría menos del stock mínimo
-        if (($producto['stock_actual'] - $cantidad) < $producto['stock_minimo']) {
+        if (($stock_anterior - $cantidad) < $producto['stock_minimo']) {
             echo json_encode(['success' => false, 'message' => 'No se puede realizar la salida. Después de esta operación quedaría menos del stock mínimo permitido']);
             exit;
         }
+        
+        $stock_posterior = $stock_anterior - $cantidad;
+    } else {
+        $stock_posterior = $stock_anterior + $cantidad;
     }
 
     // Validar campos adicionales según el tipo de movimiento
@@ -82,9 +95,9 @@ try {
     // Iniciar transacción
     $conn->beginTransaction();
 
-    // Insertar movimiento
-    $stmt = $conn->prepare("INSERT INTO movimientos (id_producto, tipo_movimiento, cantidad, motivo, fecha, proveedor, monto, parcela, trabajador) 
-                           VALUES (?, ?, ?, ?, NOW(), ?, ?, ?, ?)");
+    // Insertar movimiento con stock anterior y posterior
+    $stmt = $conn->prepare("INSERT INTO movimientos (id_producto, tipo_movimiento, cantidad, motivo, fecha, proveedor, monto, parcela, trabajador, stock_anterior, stock_posterior) 
+                           VALUES (?, ?, ?, ?, NOW(), ?, ?, ?, ?, ?, ?)");
     $stmt->execute([
         $id_producto, 
         $tipo_movimiento, 
@@ -93,17 +106,14 @@ try {
         $_POST['proveedor'] ?? null,
         $_POST['monto'] ?? null,
         $_POST['parcela'] ?? null,
-        $_POST['trabajador'] ?? null
+        $_POST['trabajador'] ?? null,
+        $stock_anterior,
+        $stock_posterior
     ]);
 
     // Actualizar stock del producto
-    if ($tipo_movimiento === 'entrada') {
-        $stmt = $conn->prepare("UPDATE productos SET stock_actual = stock_actual + ? WHERE id_producto = ?");
-    } else if ($tipo_movimiento === 'salida') {
-        $stmt = $conn->prepare("UPDATE productos SET stock_actual = stock_actual - ? WHERE id_producto = ?");
-    }
-
-    $stmt->execute([$cantidad, $id_producto]);
+    $stmt = $conn->prepare("UPDATE productos SET cantidad = ? WHERE id_producto = ?");
+    $stmt->execute([$stock_posterior, $id_producto]);
 
     // Confirmar transacción
     $conn->commit();
