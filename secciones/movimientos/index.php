@@ -29,6 +29,11 @@ require_once '../../php/config.php';
                                 <i class="bi bi-arrow-left-right"></i> Movimientos
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="../alertas/index.php">
+                                <i class="bi bi-bell"></i> Alertas
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </nav>

@@ -29,6 +29,11 @@ require_once '../../php/config.php';
                                 <i class="bi bi-arrow-left-right"></i> Movimientos
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="../alertas/index.php">
+                                <i class="bi bi-bell"></i> Alertas
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </nav>
@@ -92,7 +97,7 @@ require_once '../../php/config.php';
                             <tbody>
                                 <?php
                                 try {
-                                    $stmt = $conn->query("SELECT * FROM productos ORDER BY nombre");
+                                    $stmt = $conn->query("SELECT id_producto, nombre, categoria, presentacion, cantidad as stock_actual, stock_minimo, fecha_caducidad, ubicacion, proveedor, 1 as activo FROM productos ORDER BY nombre");
                                     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                                         // Formatear la fecha de caducidad
                                         $fechaCaducidad = !empty($row['fecha_caducidad']) ? date('d/m/Y', strtotime($row['fecha_caducidad'])) : '-';
