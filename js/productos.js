@@ -6,6 +6,20 @@ $(document).ready(function() {
         
         // Validar el formulario
         if (form[0].checkValidity()) {
+            // Validar stock mínimo
+            const stockMinimo = parseInt($('#stockMinimo').val());
+            if (stockMinimo < 10) {
+                mostrarAlerta('El stock mínimo debe ser de 10 unidades o más', 'danger');
+                return;
+            }
+
+            // Validar cantidad
+            const cantidad = parseInt($('#cantidad').val());
+            if (cantidad < 10) {
+                mostrarAlerta('La cantidad debe ser de 10 unidades o más', 'danger');
+                return;
+            }
+
             // Recopilar datos del formulario
             const productoData = {
                 id: $('#productoId').val(),
@@ -62,6 +76,11 @@ $(document).ready(function() {
         // Realizar la búsqueda
         buscarProductos(criteriosBusqueda);
     });
+
+    actualizarTabla();
+    
+    // Actualizar tabla cada 30 segundos
+    setInterval(actualizarTabla, 30000);
 });
 
 // Función para guardar un nuevo producto
@@ -183,32 +202,28 @@ function editarProducto(id) {
 
 // Función para cambiar estado del producto
 function cambiarEstado(id) {
-    console.log('ID del producto:', id);
-    
-    $.ajax({
-        url: '../../secciones/productos/cambiar_estado.php',
-        type: 'POST',
-        data: {
-            id: id
-        },
-        dataType: 'json',
-        success: function(response) {
-            console.log('Respuesta del servidor:', response);
-            if (response.success) {
-                // Recargar la tabla de productos
-                cargarProductos();
-                // Mostrar mensaje de éxito
-                alert(response.message);
-            } else {
-                alert('Error: ' + response.message);
+    if (confirm('¿Estás seguro de que deseas cambiar el estado de este producto?')) {
+        $.ajax({
+            url: '../../secciones/productos/actualizar_estado.php',
+            method: 'POST',
+            data: { id: id },
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    // Actualizar la tabla
+                    actualizarTabla();
+                    // Mostrar mensaje de éxito
+                    mostrarAlerta(response.message, 'success');
+                } else {
+                    mostrarAlerta(response.message, 'danger');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error al cambiar el estado:', error);
+                mostrarAlerta('Error al cambiar el estado del producto', 'danger');
             }
-        },
-        error: function(xhr, status, error) {
-            console.error('Error al cambiar el estado:', error);
-            console.error('Respuesta del servidor:', xhr.responseText);
-            alert('Error al cambiar el estado del producto');
-        }
-    });
+        });
+    }
 }
 
 // Función para cargar todos los productos
@@ -216,6 +231,21 @@ function cargarProductos() {
     $.ajax({
         url: '../../secciones/productos/listar.php',
         method: 'GET',
+        success: function(response) {
+            $('.table-responsive').html(response);
+        },
+        error: function(xhr, status, error) {
+            console.error('Error al cargar los productos:', error);
+            console.error('Respuesta del servidor:', xhr.responseText);
+            alert('Error al cargar los productos. Por favor, recargue la página.');
+        }
+    });
+}
+
+function actualizarTabla() {
+    $.ajax({
+        url: '../../secciones/productos/listar.php',
+        type: 'GET',
         success: function(response) {
             $('.table-responsive').html(response);
         },

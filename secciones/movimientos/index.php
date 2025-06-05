@@ -29,6 +29,14 @@ require_once '../../php/config.php';
                                 <i class="bi bi-arrow-left-right"></i> Movimientos
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="../alertas/index.php">
+                                <i class="bi bi-bell"></i> Alertas
+                                <span id="indicadorAlertas" class="position-relative ms-1" style="display: none;">
+                                    <i class="bi bi-exclamation-triangle-fill text-warning"></i>
+                                </span>
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </nav>
@@ -43,6 +51,7 @@ require_once '../../php/config.php';
                     <div class="col-12">
                         <div class="card">
                             <div class="card-body">
+                                <h5 class="card-title mb-3">Registrar Movimiento</h5>
                                 <div class="d-flex gap-2 align-items-center">
                                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#nuevoMovimientoModal">
                                         <i class="bi bi-plus-circle"></i> Nuevo Movimiento
@@ -55,8 +64,11 @@ require_once '../../php/config.php';
                                         <span class="input-group-text">Hasta</span>
                                         <input type="date" class="form-control" id="fechaHasta">
                                     </div>
-                                    <button type="button" class="btn btn-secondary" id="btnBuscar">
+                                    <button type="button" class="btn btn-secondary" id="btnBuscarFechas">
                                         <i class="bi bi-search"></i> Buscar
+                                    </button>
+                                    <button type="button" class="btn btn-info" id="btnRegresar" style="display: none;">
+                                        <i class="bi bi-arrow-counterclockwise"></i> Regresar
                                     </button>
                                 </div>
                             </div>
@@ -71,67 +83,16 @@ require_once '../../php/config.php';
                                 <tr>
                                     <th>Fecha</th>
                                     <th>Producto</th>
-                                    <th>Stock Actual</th>
                                     <th>Tipo</th>
-                                    <th>Cantidad</th>
+                                    <th>Cantidad Anterior</th>
+                                    <th>Cantidad Movimiento</th>
+                                    <th>Stock Actual</th>
                                     <th>Motivo</th>
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php
-                                try {
-                                    $stmt = $conn->query("SELECT m.*, p.nombre as producto_nombre, p.stock_actual 
-                                                        FROM movimientos m 
-                                                        LEFT JOIN productos p ON m.id_producto = p.id_producto 
-                                                        ORDER BY m.fecha DESC");
-                                    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                                        // Formatear la fecha
-                                        $fecha = date('d/m/Y H:i', strtotime($row['fecha']));
-                                        
-                                        // Determinar el color del tipo de movimiento
-                                        $tipoClass = '';
-                                        switch(strtolower($row['tipo_movimiento'])) {
-                                            case 'entrada':
-                                                $tipoClass = 'text-success';
-                                                break;
-                                            case 'salida':
-                                                $tipoClass = 'text-danger';
-                                                break;
-                                            case 'transferencia':
-                                                $tipoClass = 'text-warning';
-                                                break;
-                                        }
-
-                                        // Determinar el color del stock
-                                        $stockClass = '';
-                                        if ($row['stock_actual'] <= 0) {
-                                            $stockClass = 'text-danger';
-                                        } elseif ($row['stock_actual'] < 10) {
-                                            $stockClass = 'text-warning';
-                                        } else {
-                                            $stockClass = 'text-success';
-                                        }
-                                        ?>
-                                        <tr>
-                                            <td><?php echo $fecha; ?></td>
-                                            <td><?php echo htmlspecialchars($row['producto_nombre']); ?></td>
-                                            <td><span class="<?php echo $stockClass; ?>"><?php echo number_format($row['stock_actual'], 2); ?></span></td>
-                                            <td><span class="<?php echo $tipoClass; ?>"><?php echo ucfirst($row['tipo_movimiento']); ?></span></td>
-                                            <td><?php echo number_format($row['cantidad'], 2); ?></td>
-                                            <td><?php echo htmlspecialchars($row['motivo']); ?></td>
-                                            <td>
-                                                <button type="button" class="btn btn-sm btn-info btn-historial" data-id="<?php echo $row['id_producto']; ?>">
-                                                    <i class="bi bi-clock-history"></i> Historial
-                                                </button>
-                                            </td>
-                                        </tr>
-                                        <?php
-                                    }
-                                } catch(PDOException $e) {
-                                    echo '<tr><td colspan="7" class="text-center text-danger">Error al cargar los movimientos: ' . $e->getMessage() . '</td></tr>';
-                                }
-                                ?>
+                                <!-- Aquí se cargarán los movimientos -->
                             </tbody>
                         </table>
                     </div>
@@ -140,91 +101,47 @@ require_once '../../php/config.php';
         </div>
     </div>
 
-    <!-- Modal para Historial de Producto -->
-    <div class="modal fade" id="historialModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
+    <!-- Modal Nuevo Movimiento -->
+    <div class="modal fade" id="nuevoMovimientoModal" tabindex="-1" aria-labelledby="nuevoMovimientoModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Historial de Movimientos</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <h5 class="modal-title" id="nuevoMovimientoModalLabel">Nuevo Movimiento</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div id="historialContenido"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal para Nuevo Movimiento -->
-    <div class="modal fade" id="nuevoMovimientoModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Nuevo Movimiento</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="formMovimiento">
-                        <!-- Campo oculto para el ID del producto -->
-                        <input type="hidden" name="id_producto" id="id_producto">
-                        
-                        <!-- Selector de Producto -->
-                        <div class="mb-4">
-                            <label class="form-label fw-bold">Producto</label>
-                            <select class="form-select" id="selectProducto" name="select_producto" required>
+                    <form id="formNuevoMovimiento">
+                        <div class="mb-3">
+                            <label for="producto" class="form-label">Producto</label>
+                            <select class="form-select" id="producto" required>
                                 <option value="">Seleccione un producto</option>
-                                <?php
-                                try {
-                                    $stmt = $conn->query("SELECT id_producto, nombre, stock_actual 
-                                                        FROM productos 
-                                                        ORDER BY nombre");
-                                    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                                        echo sprintf(
-                                            '<option value="%d" data-stock="%f">%s (Stock: %s)</option>',
-                                            $row['id_producto'],
-                                            $row['stock_actual'],
-                                            htmlspecialchars($row['nombre']),
-                                            number_format($row['stock_actual'], 2)
-                                        );
-                                    }
-                                } catch(PDOException $e) {
-                                    echo '<option value="">Error al cargar productos</option>';
-                                }
-                                ?>
                             </select>
                         </div>
-
-                        <!-- Tipo de Movimiento -->
-                        <div class="mb-4">
-                            <label class="form-label fw-bold">Tipo de Movimiento</label>
-                            <div class="btn-group w-100" role="group">
-                                <input type="radio" class="btn-check" name="tipo_movimiento" id="tipoEntrada" value="entrada" autocomplete="off">
-                                <label class="btn btn-outline-success" for="tipoEntrada">Entrada</label>
-
-                                <input type="radio" class="btn-check" name="tipo_movimiento" id="tipoSalida" value="salida" autocomplete="off">
-                                <label class="btn btn-outline-danger" for="tipoSalida">Salida</label>
-
-                                <input type="radio" class="btn-check" name="tipo_movimiento" id="tipoTransferencia" value="transferencia" autocomplete="off">
-                                <label class="btn btn-outline-warning" for="tipoTransferencia">Transferencia</label>
-                            </div>
+                        <div class="mb-3">
+                            <label for="tipo_movimiento" class="form-label">Tipo de Movimiento</label>
+                            <select class="form-select" id="tipo_movimiento" required onchange="mostrarCamposAdicionales()">
+                                <option value="">Seleccione un tipo</option>
+                                <option value="entrada">Entrada</option>
+                                <option value="salida">Salida</option>
+                            </select>
                         </div>
 
                         <!-- Campos para Entrada -->
                         <div id="camposEntrada" style="display: none;">
                             <div class="mb-3">
-                                <label class="form-label">Proveedor</label>
-                                <select class="form-select" name="proveedor">
+                                <label for="proveedor" class="form-label">Proveedor</label>
+                                <select class="form-select" id="proveedor">
                                     <option value="">Seleccione un proveedor</option>
-                                    <option value="1">Proveedor 1</option>
-                                    <option value="2">Proveedor 2</option>
-                                    <option value="3">Proveedor 3</option>
+                                    <option value="proveedor1">Proveedor 1</option>
+                                    <option value="proveedor2">Proveedor 2</option>
+                                    <option value="proveedor3">Proveedor 3</option>
                                 </select>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Monto</label>
+                                <label for="monto" class="form-label">Monto</label>
                                 <div class="input-group">
                                     <span class="input-group-text">$</span>
-                                    <input type="text" class="form-control" name="monto" placeholder="0.00">
+                                    <input type="number" class="form-control" id="monto" min="0" step="0.01" placeholder="0.00">
                                 </div>
                             </div>
                         </div>
@@ -232,17 +149,17 @@ require_once '../../php/config.php';
                         <!-- Campos para Salida -->
                         <div id="camposSalida" style="display: none;">
                             <div class="mb-3">
-                                <label class="form-label">Parcela</label>
-                                <select class="form-select" name="parcela">
+                                <label for="parcela" class="form-label">Parcela</label>
+                                <select class="form-select" id="parcela">
                                     <option value="">Seleccione una parcela</option>
-                                    <option value="1">Parcela 1</option>
-                                    <option value="2">Parcela 2</option>
-                                    <option value="3">Parcela 3</option>
+                                    <option value="parcela1">Parcela 1</option>
+                                    <option value="parcela2">Parcela 2</option>
+                                    <option value="parcela3">Parcela 3</option>
                                 </select>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Trabajador</label>
-                                <select class="form-select" name="trabajador">
+                                <label for="trabajador" class="form-label">Trabajador</label>
+                                <select class="form-select" id="trabajador" name="trabajador" required>
                                     <option value="">Seleccione un trabajador</option>
                                     <option value="1">Trabajador 1</option>
                                     <option value="2">Trabajador 2</option>
@@ -251,79 +168,28 @@ require_once '../../php/config.php';
                             </div>
                         </div>
 
-                        <!-- Campos para Transferencia -->
-                        <div id="camposTransferencia" style="display: none;">
-                            <div class="mb-3">
-                                <label class="form-label">Destino</label>
-                                <select class="form-select" name="destino">
-                                    <option value="">Seleccione un destino</option>
-                                    <option value="1">Almacén Principal</option>
-                                    <option value="2">Almacén Secundario</option>
-                                    <option value="3">Bodega</option>
-                                </select>
-                            </div>
+                        <div class="mb-3">
+                            <label for="cantidad" class="form-label">Cantidad</label>
+                            <input type="number" class="form-control" id="cantidad" required min="0.01" step="0.01">
                         </div>
 
-                        <!-- Campos Comunes -->
                         <div class="mb-3">
-                            <label class="form-label">Cantidad</label>
-                            <input type="number" class="form-control" name="cantidad" step="0.01" min="0.01" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Motivo</label>
-                            <textarea class="form-control" name="motivo" rows="3" required></textarea>
+                            <label for="motivo" class="form-label">Motivo</label>
+                            <textarea class="form-control" id="motivo" rows="3" required></textarea>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary" onclick="guardarMovimiento()">Guardar</button>
+                    <button type="button" class="btn btn-primary" id="btnGuardarMovimiento">Guardar</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Scripts -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Definir la ruta base para las llamadas AJAX
-        const BASE_URL = window.location.pathname.substring(0, window.location.pathname.indexOf('/secciones/movimientos/'));
-        
-        // Verificar que jQuery está cargado
-        console.log('jQuery version:', $.fn.jquery);
-        
-        // Verificar que Bootstrap está cargado
-        console.log('Bootstrap Modal:', typeof bootstrap.Modal);
-    </script>
-    <script src="../../js/movimientos.js?v=<?php echo time(); ?>"></script>
-    <script>
-        // Verificar que las funciones están disponibles
-        console.log('verHistorial disponible:', typeof verHistorial);
-        console.log('guardarMovimiento disponible:', typeof guardarMovimiento);
-        
-        // Agregar evento al botón de nuevo movimiento
-        document.addEventListener('DOMContentLoaded', function() {
-            const btnNuevoMovimiento = document.querySelector('[data-bs-target="#nuevoMovimientoModal"]');
-            if (btnNuevoMovimiento) {
-                btnNuevoMovimiento.addEventListener('click', function() {
-                    console.log('Botón de nuevo movimiento clickeado');
-                    const modal = new bootstrap.Modal(document.getElementById('nuevoMovimientoModal'));
-                    modal.show();
-                });
-            }
-        });
-
-        // Agregar evento a los botones de historial
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.btn-historial').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const idProducto = this.getAttribute('data-id');
-                    console.log('Ver historial para producto:', idProducto);
-                    verHistorial(idProducto);
-                });
-            });
-        });
-    </script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="/inventario/js/movimientos.js"></script>
+    <script src="/inventario/js/menu_alertas.js"></script>
 </body>
 </html> 
