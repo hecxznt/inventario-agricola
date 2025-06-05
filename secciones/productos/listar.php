@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         }
 
         // Si no, mostrar la tabla completa
-        $sql = "SELECT id_producto, nombre, categoria, presentacion, cantidad as stock_actual, stock_minimo, fecha_caducidad, ubicacion, proveedor, 1 as activo FROM productos ORDER BY nombre";
+        $sql = "SELECT id_producto, nombre, categoria, presentacion, cantidad as stock_actual, stock_minimo, fecha_caducidad, ubicacion, proveedor, activo FROM productos ORDER BY nombre";
         $stmt = $conn->query($sql);
         
         if ($stmt->rowCount() > 0) {
@@ -62,6 +62,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                         $presentacion = $row['presentacion'];
                 }
                 
+                // Determinar el estado y el ícono
+                $estado = $row['activo'] ? 
+                    '<span class="badge bg-success">Activo</span>' : 
+                    '<span class="badge bg-danger">Deshabilitado</span>';
+                $icono = $row['activo'] ? 
+                    '<i class="bi bi-eye"></i>' : 
+                    '<i class="bi bi-eye-slash"></i>';
+                $titulo = $row['activo'] ? 'Deshabilitar' : 'Habilitar';
+                $color_boton = $row['activo'] ? 'btn-success' : 'btn-danger';
+                
                 echo '<tr>
                         <td>' . htmlspecialchars($row['nombre']) . '</td>
                         <td>' . htmlspecialchars($row['categoria']) . '</td>
@@ -71,19 +81,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                         <td>' . $fechaCaducidad . '</td>
                         <td>' . htmlspecialchars($row['ubicacion']) . '</td>
                         <td>' . htmlspecialchars($row['proveedor']) . '</td>
-                        <td>
-                            <span class="badge bg-success">Activo</span>
-                        </td>
+                        <td>' . $estado . '</td>
                         <td>
                             <div class="btn-group" role="group">
                                 <button type="button" class="btn btn-sm btn-primary" title="Editar" 
                                         onclick="editarProducto(' . $row['id_producto'] . ')">
                                     <i class="bi bi-pencil"></i>
                                 </button>
-                                <button type="button" class="btn btn-sm btn-success" 
-                                        title="Deshabilitar"
+                                <button type="button" class="btn btn-sm ' . $color_boton . '" 
+                                        title="' . $titulo . '"
                                         onclick="cambiarEstado(' . $row['id_producto'] . ')">
-                                    <i class="bi bi-eye"></i>
+                                    ' . $icono . '
                                 </button>
                             </div>
                         </td>

@@ -202,32 +202,28 @@ function editarProducto(id) {
 
 // Función para cambiar estado del producto
 function cambiarEstado(id) {
-    console.log('ID del producto:', id);
-    
-    $.ajax({
-        url: '../../secciones/productos/cambiar_estado.php',
-        type: 'POST',
-        data: {
-            id: id
-        },
-        dataType: 'json',
-        success: function(response) {
-            console.log('Respuesta del servidor:', response);
-            if (response.success) {
-                // Recargar la tabla de productos
-                cargarProductos();
-                // Mostrar mensaje de éxito
-                alert(response.message);
-            } else {
-                alert('Error: ' + response.message);
+    if (confirm('¿Estás seguro de que deseas cambiar el estado de este producto?')) {
+        $.ajax({
+            url: '../../secciones/productos/actualizar_estado.php',
+            method: 'POST',
+            data: { id: id },
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    // Actualizar la tabla
+                    actualizarTabla();
+                    // Mostrar mensaje de éxito
+                    mostrarAlerta(response.message, 'success');
+                } else {
+                    mostrarAlerta(response.message, 'danger');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error al cambiar el estado:', error);
+                mostrarAlerta('Error al cambiar el estado del producto', 'danger');
             }
-        },
-        error: function(xhr, status, error) {
-            console.error('Error al cambiar el estado:', error);
-            console.error('Respuesta del servidor:', xhr.responseText);
-            alert('Error al cambiar el estado del producto');
-        }
-    });
+        });
+    }
 }
 
 // Función para cargar todos los productos
