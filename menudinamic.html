@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página dinámica</title>
+    <style>
+        .section {
+            display: none; /* Ocultamos todas las secciones por defecto */
+        }
+        .section.active {
+            display: block; /* Mostramos solo la sección activa */
+        }
+    </style>
+</head>
+<body>
+    <h1>Página dinámica con menú</h1>
+    <nav>
+        <ul>
+            <li><button onclick="showSection('section1')">Sección 1</button></li>
+            <li><button onclick="showSection('section2')">Sección 2</button></li>
+            <li><button onclick="showSection('section3')">Sección 3</button></li>
+        </ul>
+    </nav>
+
+    <div id="content">
+        <div id="section1" class="section">Contenido de la Sección 1</div>
+        <div id="section2" class="section">Contenido de la Sección 2</div>
+        <div id="section3" class="section">Contenido de la Sección 3</div>
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            // Oculta todas las secciones
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => section.classList.remove('active'));
+
+            // Muestra la sección seleccionada
+            const selectedSection = document.getElementById(sectionId);
+            selectedSection.classList.add('active');
+        }
+    </script>
+</body>
+</html>

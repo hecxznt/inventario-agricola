@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web Serial API con PHP</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    #log {
+      margin-top: 20px;
+      max-height: 300px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      padding: 10px;
+      background-color: #f9f9f9;
+    }
+  </style>
+</head>
+<body>
+  <h1>Web Serial API con PHP</h1>
+  <button id="connect">Conectar al dispositivo</button>
+  <button id="disconnect" disabled>Desconectar</button>
+  <button id="send" disabled>Enviar datos al servidor</button>
+  <textarea id="output" placeholder="Introduce datos para enviar al servidor..." rows="4" cols="50" disabled></textarea>
+  <div id="log"></div>
+
+  <script>
+    let port = null; // Variable para el puerto serial
+    let reader = null; // Reader para leer datos
+    let deviceData = ''; // Almacena datos recibidos
+
+    // Actualiza el log en la página
+    function logMessage(message) {
+      const log = document.getElementById('log');
+      log.innerHTML += `<p>${message}</p>`;
+      log.scrollTop = log.scrollHeight;
+    }
+
+    // Conectar al dispositivo
+    document.getElementById('connect').addEventListener('click', async () => {
+      try {
+        port = await navigator.serial.requestPort();
+        await port.open({ baudRate: 9600 });
+
+        logMessage('Conexión establecida');
+        document.getElementById('disconnect').disabled = false;
+        document.getElementById('send').disabled = false;
+        document.getElementById('output').disabled = false;
+
+        // Inicia la lectura de datos
+        reader = port.readable.getReader();
+        readSerialData();
+      } catch (error) {
+        logMessage(`Error al conectar: ${error.message}`);
+      }
+    });
+
+    // Leer datos del puerto serial
+    async function readSerialData() {
+      while (port && reader) {
+        try {
+          const { value, done } = await reader.read();
+          if (done) break; // Finaliza si no hay más datos
+          const data = new TextDecoder().decode(value);
+          deviceData += data; // Almacena los datos
+          logMessage(`Dato recibido: ${data}`);
+        } catch (error) {
+          logMessage(`Error al leer datos: ${error.message}`);
+          break;
+        }
+      }
+    }
+
+    // Enviar datos al servidor
+    document.getElementById('send').addEventListener('click', async () => {
+      const dataToSend = document.getElementById('output').value || deviceData;
+
+      if (!dataToSend) {
+        logMessage('No hay datos para enviar');
+        return;
+      }
+
+      try {
+        const response = await fetch('process.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ data: dataToSend })
+        });
+        const result = await response.json();
+        logMessage(`Servidor respondió: ${result.message}`);
+      } catch (error) {
+        logMessage(`Error al enviar datos: ${error.message}`);
+      }
+    });
+
+    // Desconectar del dispositivo
+    document.getElementById('disconnect').addEventListener('click', async () => {
+      try {
+        if (reader) {
+          await reader.cancel();
+          reader.releaseLock();
+        }
+        if (port) {
+          await port.close();
+        }
+        port = null;
+
+        logMessage('Conexión cerrada');
+        document.getElementById('disconnect').disabled = true;
+        document.getElementById('send').disabled = true;
+        document.getElementById('output').disabled = true;
+      } catch (error) {
+        logMessage(`Error al desconectar: ${error.message}`);
+      }
+    });
+  </script>
+</body>
+</html>
