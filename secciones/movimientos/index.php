@@ -85,21 +85,22 @@ require_once '../../php/config.php';
 
                 <div class="content">
                     <div class="table-responsive">
-                        <table class="table table-striped table-hover">
-                            <thead class="table-dark">
+                        <table class="table table-striped">
+                            <thead>
                                 <tr>
+                                    <th>#</th>
                                     <th>Fecha</th>
                                     <th>Producto</th>
                                     <th>Tipo</th>
-                                    <th>Cantidad Anterior</th>
-                                    <th>Cantidad Movimiento</th>
-                                    <th>Stock Actual</th>
+                                    <th>Stock Anterior</th>
+                                    <th>Cantidad</th>
+                                    <th>Stock Posterior</th>
                                     <th>Motivo</th>
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <!-- Aquí se cargarán los movimientos -->
+                            <tbody id="historialMovimientos">
+                                <!-- Los movimientos se cargarán aquí -->
                             </tbody>
                         </table>
                     </div>
