@@ -56,6 +56,13 @@ require_once '../../php/config.php';
                                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#nuevoMovimientoModal">
                                         <i class="bi bi-plus-circle"></i> Nuevo Movimiento
                                     </button>
+                                    <div class="input-group" style="max-width: 300px;">
+                                        <span class="input-group-text">Producto</span>
+                                        <input type="text" class="form-control" id="buscarProducto" placeholder="Buscar producto...">
+                                        <div id="resultadosBusqueda" class="position-absolute w-100" style="z-index: 1000; display: none;">
+                                            <ul class="list-group"></ul>
+                                        </div>
+                                    </div>
                                     <div class="input-group" style="max-width: 200px;">
                                         <span class="input-group-text">Desde</span>
                                         <input type="date" class="form-control" id="fechaDesde">
@@ -189,7 +196,7 @@ require_once '../../php/config.php';
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="/inventario/js/movimientos.js"></script>
-    <script src="/inventario/js/menu_alertas.js"></script>
+    <script src="../../js/movimientos.js"></script>
+    <script src="../../js/menu_alertas.js"></script>
 </body>
 </html> 

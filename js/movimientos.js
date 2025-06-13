@@ -19,9 +19,11 @@ $(document).ready(function() {
 
     // Manejar el botón de regresar
     $('#btnRegresar').on('click', function() {
-        // Limpiar los campos de fecha
+        // Limpiar los campos de fecha y producto
         $('#fechaDesde').val('');
         $('#fechaHasta').val('');
+        $('#buscarProducto').val('');
+        productoSeleccionado = null;
         
         // Ocultar el botón de regresar
         $('#btnRegresar').hide();
@@ -29,7 +31,61 @@ $(document).ready(function() {
         // Recargar la tabla con todos los movimientos
         cargarMovimientos();
     });
+
+    // Evento para el campo de búsqueda de productos
+    $('#buscarProducto').on('input', function() {
+        buscarProductos($(this).val());
+    });
+
+    // Cerrar resultados al hacer clic fuera
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('#buscarProducto, #resultadosBusqueda').length) {
+            $('#resultadosBusqueda').hide();
+        }
+    });
 });
+
+// Variable para almacenar el producto seleccionado
+let productoSeleccionado = null;
+
+// Función para buscar productos
+function buscarProductos(termino) {
+    if (termino.length < 1) {
+        $('#resultadosBusqueda').hide();
+        return;
+    }
+
+    $.ajax({
+        url: '../../secciones/productos/buscar_autocomplete.php',
+        type: 'GET',
+        data: { q: termino },
+        success: function(response) {
+            const resultadosDiv = $('#resultadosBusqueda .list-group');
+            resultadosDiv.empty();
+
+            if (response.success && response.productos.length > 0) {
+                response.productos.forEach(function(producto) {
+                    const item = $(`<li class="list-group-item list-group-item-action">${producto.nombre}</li>`);
+                    item.click(function() {
+                        seleccionarProducto(producto.id_producto, producto.nombre);
+                    });
+                    resultadosDiv.append(item);
+                });
+                $('#resultadosBusqueda').show();
+            } else {
+                $('#resultadosBusqueda').hide();
+            }
+        }
+    });
+}
+
+// Función para seleccionar un producto
+function seleccionarProducto(id, nombre) {
+    productoSeleccionado = { id: id, nombre: nombre };
+    $('#buscarProducto').val(nombre);
+    $('#resultadosBusqueda').hide();
+    cargarMovimientos(); // Recargar movimientos con el producto seleccionado
+}
 
 function mostrarCamposAdicionales() {
     const tipoMovimiento = $('#tipo_movimiento').val();
@@ -78,13 +134,15 @@ function cargarProductos() {
 function cargarMovimientos() {
     const fechaDesde = $('#fechaDesde').val();
     const fechaHasta = $('#fechaHasta').val();
+    const idProducto = productoSeleccionado ? productoSeleccionado.id : null;
 
     $.ajax({
         url: '../../secciones/movimientos/obtener_historial.php',
         type: 'GET',
         data: {
             fecha_desde: fechaDesde,
-            fecha_hasta: fechaHasta
+            fecha_hasta: fechaHasta,
+            id_producto: idProducto
         },
         success: function(response) {
             $('tbody').html(response);

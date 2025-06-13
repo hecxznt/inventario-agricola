@@ -9,6 +9,12 @@ try {
     $params = [];
     $where = [];
 
+    // Filtrar por producto
+    if (isset($_GET['id_producto']) && !empty($_GET['id_producto'])) {
+        $where[] = "m.id_producto = ?";
+        $params[] = $_GET['id_producto'];
+    }
+
     // Filtrar por fecha desde
     if (isset($_GET['fecha_desde']) && !empty($_GET['fecha_desde'])) {
         $where[] = "DATE(m.fecha) >= ?";
