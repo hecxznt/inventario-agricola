@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         }
 
         // Si no, mostrar la tabla completa
-        $sql = "SELECT id_producto, nombre, categoria, presentacion, cantidad as stock_actual, stock_minimo, fecha_caducidad, ubicacion, proveedor, 1 as activo FROM productos ORDER BY nombre";
+        $sql = "SELECT id_producto, nombre, categoria, presentacion, cantidad as stock_actual, stock_minimo, fecha_caducidad, ubicacion, proveedor, activo FROM productos ORDER BY nombre";
         $stmt = $conn->query($sql);
         
         if ($stmt->rowCount() > 0) {
@@ -72,7 +72,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                         <td>' . htmlspecialchars($row['ubicacion']) . '</td>
                         <td>' . htmlspecialchars($row['proveedor']) . '</td>
                         <td>
-                            <span class="badge bg-success">Activo</span>
+                            <span class="badge bg-' . ($row['activo'] ? 'success' : 'danger') . '">' . 
+                            ($row['activo'] ? 'Activo' : 'Deshabilitado') . '</span>
                         </td>
                         <td>
                             <div class="btn-group" role="group">
@@ -80,10 +81,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                                         onclick="editarProducto(' . $row['id_producto'] . ')">
                                     <i class="bi bi-pencil"></i>
                                 </button>
-                                <button type="button" class="btn btn-sm btn-success" 
-                                        title="Deshabilitar"
+                                <button type="button" class="btn btn-sm ' . ($row['activo'] ? 'btn-danger' : 'btn-success') . '" 
+                                        title="' . ($row['activo'] ? 'Deshabilitar' : 'Habilitar') . '"
                                         onclick="cambiarEstado(' . $row['id_producto'] . ')">
-                                    <i class="bi bi-eye"></i>
+                                    <i class="bi ' . ($row['activo'] ? 'bi-eye-slash' : 'bi-eye') . '"></i>
                                 </button>
                             </div>
                         </td>
@@ -95,15 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             echo '<div class="alert alert-info">No hay productos registrados.</div>';
         }
     } catch(PDOException $e) {
-        if (isset($_GET['selector']) && $_GET['selector'] === 'true') {
-            header('Content-Type: application/json');
-            echo json_encode([
-                'success' => false,
-                'message' => 'Error al cargar los productos: ' . $e->getMessage()
-            ]);
-        } else {
-            echo '<div class="alert alert-danger">Error al cargar los productos: ' . $e->getMessage() . '</div>';
-        }
+        echo '<div class="alert alert-danger">Error al cargar los datos: ' . $e->getMessage() . '</div>';
     }
 } else {
     if (isset($_GET['selector']) && $_GET['selector'] === 'true') {

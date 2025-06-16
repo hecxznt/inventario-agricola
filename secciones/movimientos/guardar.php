@@ -1,5 +1,6 @@
 <?php
 require_once '../../php/config.php';
+require_once '../../secciones/alertas/enviar_alerta.php';
 
 header('Content-Type: application/json');
 
@@ -118,9 +119,12 @@ try {
     // Confirmar transacción
     $conn->commit();
 
+    // Verificar y enviar alertas después de guardar el movimiento
+    verificarYEnviarAlertas();
+
     echo json_encode(['success' => true, 'message' => 'Movimiento guardado correctamente']);
 
-} catch(PDOException $e) {
+} catch(Exception $e) {
     // Revertir transacción en caso de error
     if ($conn->inTransaction()) {
         $conn->rollBack();

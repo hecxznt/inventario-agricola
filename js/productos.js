@@ -128,23 +128,21 @@ function guardarProducto(productoData) {
     });
 }
 
+// Función para mostrar alertas
 function mostrarAlerta(mensaje, tipo) {
     if (tipo === 'danger') {
         // Mostrar error en el modal
         $('#errorMessage').text(mensaje);
-        $('#errorModal').modal('show');
+        $('#errorMessage').show();
     } else {
-        // Mostrar éxito como alerta normal
-        let alerta = `
+        // Mostrar alerta en la página
+        const alerta = `
             <div class="alert alert-${tipo} alert-dismissible fade show" role="alert">
                 ${mensaje}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         `;
-        $('.content').prepend(alerta);
-        setTimeout(function() {
-            $('.alert').alert('close');
-        }, 5000);
+        $('#alertasContainer').html(alerta);
     }
 }
 
@@ -170,32 +168,28 @@ function buscarProductos(criterios) {
 function editarProducto(id) {
     $.ajax({
         url: '../../secciones/productos/obtener.php',
-        method: 'GET',
+        type: 'GET',
         data: { id: id },
-        dataType: 'json',
-        success: function(response) {
+        success: function(producto) {
+            $('#productoId').val(producto.id_producto);
+            $('#nombre').val(producto.nombre);
+            $('#categoria').val(producto.categoria);
+            $('#presentacion').val(producto.presentacion);
+            $('#cantidad').val(producto.cantidad);
+            $('#stockMinimo').val(producto.stock_minimo);
+            $('#fechaCaducidad').val(producto.fecha_caducidad);
+            $('#ubicacion').val(producto.ubicacion);
+            $('#proveedor').val(producto.proveedor);
+            
             // Cambiar el título del modal
             $('#nuevoProductoModalLabel').text('Editar Producto');
-            $('#btnGuardarProducto').text('Actualizar');
-            
-            // Llenar el formulario con los datos del producto
-            $('#productoId').val(response.id_producto);
-            $('#nombre').val(response.nombre);
-            $('#categoria').val(response.categoria);
-            $('#presentacion').val(response.presentacion);
-            $('#cantidad').val(response.cantidad);
-            $('#stockMinimo').val(response.stock_minimo);
-            $('#fechaCaducidad').val(response.fecha_caducidad);
-            $('#ubicacion').val(response.ubicacion);
-            $('#proveedor').val(response.proveedor);
             
             // Mostrar el modal
             $('#nuevoProductoModal').modal('show');
         },
         error: function(xhr, status, error) {
             console.error('Error al obtener el producto:', error);
-            console.error('Respuesta del servidor:', xhr.responseText);
-            alert('Error al cargar los datos del producto');
+            alert('Error al cargar el producto');
         }
     });
 }
