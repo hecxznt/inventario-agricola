@@ -1,0 +1,53 @@
+[33mcommit 2fa351716e92d7cb4f13b60bd4bfd1da7e661a23[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mhector_hugo[m[33m)[m
+Author: Hector <hectorcerda@gmail.com>
+Date:   Wed Jun 4 11:55:57 2025 -0600
+
+    feat: Ajustar sistema de alertas - Reducir rango de caducidad a 10 días y ajustar alertas de stock
+
+[33mcommit 33f04c291b2560640512ef41766c291a17aac8a4[m
+Author: Hector <hectorcerda@gmail.com>
+Date:   Wed Jun 4 10:10:05 2025 -0600
+
+    feat: Agregar módulo de alertas con monitoreo de stock bajo, caducidad y movimientos recientes
+
+[33mcommit 2eb99f75ef103d38e05ef000bdc1e9a808a7c029[m
+Author: Hector <hectorcerda@gmail.com>
+Date:   Fri May 30 14:53:29 2025 -0600
+
+    feat: Implementación de sistema de inventario básico - Agregado módulo de productos con validaciones de stock mínimo - Agregado módulo de movimientos con validaciones de stock - Implementada búsqueda por fechas en movimientos - Agregadas validaciones de stock mínimo (10 unidades) - Mejorada la interfaz de usuario
+
+[33mcommit cc60227852117dc1be35a16f9875dc2982a7c217[m[33m ([m[1;31morigin/master[m[33m, [m[1;32mmaster[m[33m)[m
+Author: Hector <hectorcerda@gmail.com>
+Date:   Thu May 29 15:13:27 2025 -0600
+
+    Actualización completa de la sección de movimientos con todos los archivos necesarios
+
+[33mcommit 5567d5b291bbd2035bc47e0d1ca0aeb415d2e7a7[m
+Author: Hector <hectorcerda@gmail.com>
+Date:   Thu May 29 15:08:22 2025 -0600
+
+    Mejoras en la sección de movimientos: implementación de selector de productos y corrección de eventos JavaScript
+
+[33mcommit 0d07c0485322e765a149ed8c7e81712086d4def3[m
+Author: Hector <hectorcerda@gmail.com>
+Date:   Thu May 29 10:20:46 2025 -0600
+
+    Estado actual de la sección de movimientos antes de rediseñar el formulario
+
+[33mcommit f4d999824b6cef48888c7a3891df501281288216[m
+Author: Hector <hectorcerda@gmail.com>
+Date:   Thu May 29 08:56:45 2025 -0600
+
+    Agregada sección de movimientos y mejoras en productos
+
+[33mcommit b8916c9976c143ca001af7dffead00e42633e317[m
+Author: Hector <hectorcerda@gmail.com>
+Date:   Tue May 27 08:44:54 2025 -0600
+
+    Agregado tema agrícola, cambios en la interfaz y funcionalidad de productos
+
+[33mcommit c6fc55b66b168c70cbb06e2bb8210d2ef0c48c3e[m
+Author: Hector <hectorcerda@gmail.com>
+Date:   Wed May 21 16:33:45 2025 -0600
+
+    proyecto inicial
