@@ -74,10 +74,23 @@ require_once '../../php/config.php';
                                     <button type="button" class="btn btn-secondary" id="btnBuscar">
                                         <i class="bi bi-search"></i> Buscar
                                     </button>
+                                    <button type="button" class="btn btn-outline-secondary" id="btnLimpiar">
+                                        <i class="bi bi-x-circle"></i> Limpiar
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <!-- Botones de exportar en el dashboard de productos -->
+                <div class="mb-3">
+                    <button id="btnExportarExcelProductos" class="btn btn-success">
+                        <i class="bi bi-file-earmark-excel"></i> Excel
+                    </button>
+                    <button id="btnExportarPDFProductos" class="btn btn-danger">
+                        <i class="bi bi-file-earmark-pdf"></i> PDF
+                    </button>
                 </div>
 
                 <div class="content">
@@ -93,6 +106,7 @@ require_once '../../php/config.php';
                                     <th>Fecha Caducidad</th>
                                     <th>Ubicación</th>
                                     <th>Proveedor</th>
+                                    <th>Precio</th>
                                     <th>Estado</th>
                                     <th>Acciones</th>
                                 </tr>
@@ -100,7 +114,7 @@ require_once '../../php/config.php';
                             <tbody>
                                 <?php
                                 try {
-                                    $stmt = $conn->query("SELECT id_producto, nombre, categoria, presentacion, cantidad as stock_actual, stock_minimo, fecha_caducidad, ubicacion, proveedor, 1 as activo FROM productos ORDER BY nombre");
+                                    $stmt = $conn->query("SELECT id_producto, nombre, categoria, presentacion, cantidad as stock_actual, stock_minimo, fecha_caducidad, ubicacion, proveedor, precio, 1 as activo FROM productos ORDER BY nombre");
                                     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                                         // Formatear la fecha de caducidad
                                         $fechaCaducidad = !empty($row['fecha_caducidad']) ? date('d/m/Y', strtotime($row['fecha_caducidad'])) : '-';
@@ -133,6 +147,7 @@ require_once '../../php/config.php';
                                             <td><?php echo $fechaCaducidad; ?></td>
                                             <td><?php echo htmlspecialchars($row['ubicacion']); ?></td>
                                             <td><?php echo htmlspecialchars($row['proveedor']); ?></td>
+                                            <td><?php echo ($row['categoria'] === 'insumo' && !empty($row['precio'])) ? '$' . number_format($row['precio'], 2) : '-'; ?></td>
                                             <td>
                                                 <span class="badge bg-<?php echo $row['activo'] ? 'success' : 'danger'; ?>">
                                                     <?php echo $row['activo'] ? 'Activo' : 'Deshabilitado'; ?>
@@ -155,7 +170,7 @@ require_once '../../php/config.php';
                                         <?php
                                     }
                                 } catch(PDOException $e) {
-                                    echo '<tr><td colspan="10" class="text-center text-danger">Error al cargar los productos: ' . $e->getMessage() . '</td></tr>';
+                                    echo '<tr><td colspan="11" class="text-center text-danger">Error al cargar los productos: ' . $e->getMessage() . '</td></tr>';
                                 }
                                 ?>
                             </tbody>
@@ -183,13 +198,20 @@ require_once '../../php/config.php';
                                 <input type="text" class="form-control" id="nombre" required>
                             </div>
                             <div class="col-md-6">
-                                <label for="categoria" class="form-label">Categoría</label>
+                                <label for="categoria" class="form-label">Tipo de Producto</label>
                                 <select class="form-select" id="categoria" required>
-                                    <option value="">Seleccione una categoría</option>
-                                    <option value="herramientas">Herramientas</option>
+                                    <option value="">Seleccione un tipo</option>
                                     <option value="insumos">Insumos</option>
+                                    <option value="herramientas">Herramientas</option>
                                     <option value="implemento">Implemento</option>
                                 </select>
+                            </div>
+                        </div>
+                        <!-- Campo de precio solo para insumo -->
+                        <div class="row mb-3" id="campoPrecio" style="display:none;">
+                            <div class="col-md-6">
+                                <label for="precio" class="form-label">Precio</label>
+                                <input type="number" class="form-control" id="precio" min="0" step="0.01" placeholder="Ej: 123.45">
                             </div>
                         </div>
                         <div class="row mb-3">
@@ -266,9 +288,11 @@ require_once '../../php/config.php';
         </div>
     </div>
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.7.0/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <script src="../../js/productos.js"></script>
     <script src="/inventario/js/menu_alertas.js"></script>
 </body>

@@ -21,6 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $fecha_caducidad = !empty($_POST['fechaCaducidad']) ? $_POST['fechaCaducidad'] : null;
         $ubicacion = $_POST['ubicacion'];
         $proveedor = $_POST['proveedor'];
+        $precio = (isset($_POST['precio']) && $categoria === 'insumo') ? floatval($_POST['precio']) : null;
 
         // Validar datos
         if (empty($nombre) || empty($categoria) || empty($presentacion) || empty($cantidad) || empty($stock_minimo) || empty($ubicacion) || empty($proveedor)) {
@@ -46,18 +47,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $conn->prepare("
                 UPDATE productos 
                 SET nombre = ?, categoria = ?, presentacion = ?, cantidad = ?, 
-                    stock_minimo = ?, fecha_caducidad = ?, ubicacion = ?, proveedor = ?
+                    stock_minimo = ?, fecha_caducidad = ?, ubicacion = ?, proveedor = ?, precio = ?
                 WHERE id_producto = ?
             ");
-            $stmt->execute([$nombre, $categoria, $presentacion, $cantidad, $stock_minimo, $fecha_caducidad, $ubicacion, $proveedor, $id_producto]);
+            $stmt->execute([$nombre, $categoria, $presentacion, $cantidad, $stock_minimo, $fecha_caducidad, $ubicacion, $proveedor, $precio, $id_producto]);
             $mensaje = 'Producto actualizado correctamente';
         } else {
             // Insertar nuevo producto
             $stmt = $conn->prepare("
-                INSERT INTO productos (nombre, categoria, presentacion, cantidad, stock_minimo, fecha_caducidad, ubicacion, proveedor)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO productos (nombre, categoria, presentacion, cantidad, stock_minimo, fecha_caducidad, ubicacion, proveedor, precio)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
-            $stmt->execute([$nombre, $categoria, $presentacion, $cantidad, $stock_minimo, $fecha_caducidad, $ubicacion, $proveedor]);
+            $stmt->execute([$nombre, $categoria, $presentacion, $cantidad, $stock_minimo, $fecha_caducidad, $ubicacion, $proveedor, $precio]);
             $mensaje = 'Producto guardado correctamente';
         }
 

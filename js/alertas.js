@@ -3,6 +3,25 @@ $(document).ready(function() {
     cargarStockBajo();
     cargarProductosCaducidad();
     cargarMovimientosRecientes();
+    $('#btnExportarExcelAlertas').on('click', function() {
+        var tabla = document.querySelector('.table');
+        if (!tabla) {
+            alert('No se encontró la tabla para exportar.');
+            return;
+        }
+        var wb = XLSX.utils.table_to_book(tabla, {sheet: "Alertas"});
+        XLSX.writeFile(wb, 'alertas.xlsx');
+    });
+    $('#btnExportarPDFAlertas').off('click').on('click', function() {
+        var tabla = document.querySelector('.table');
+        if (!tabla) {
+            alert('No se encontró la tabla para exportar.');
+            return;
+        }
+        var doc = new window.jspdf.jsPDF();
+        doc.autoTable({ html: tabla, theme: 'grid', headStyles: { fillColor: [220, 53, 69] } });
+        doc.save('alertas.pdf');
+    });
 });
 
 function actualizarAlertas() {

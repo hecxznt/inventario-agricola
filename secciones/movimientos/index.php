@@ -83,6 +83,16 @@ require_once '../../php/config.php';
                     </div>
                 </div>
 
+                <!-- Botones de exportar en el dashboard de movimientos -->
+                <div class="mb-3">
+                    <button id="btnExportarExcel" class="btn btn-success">
+                        <i class="bi bi-file-earmark-excel"></i> Excel
+                    </button>
+                    <button id="btnExportarPDFMovimientos" class="btn btn-danger">
+                        <i class="bi bi-file-earmark-pdf"></i> PDF
+                    </button>
+                </div>
+
                 <div class="content">
                     <div class="table-responsive">
                         <table class="table table-striped">
@@ -196,6 +206,9 @@ require_once '../../php/config.php';
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.7.0/jspdf.plugin.autotable.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="../../js/movimientos.js"></script>
     <script src="../../js/menu_alertas.js"></script>

@@ -17,6 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $fecha_caducidad = $_POST['fecha_caducidad'];
         $ubicacion = $_POST['ubicacion'];
         $proveedor = $_POST['proveedor'];
+        $precio = (isset($_POST['precio']) && $categoria === 'insumo') ? floatval($_POST['precio']) : null;
         
         // Obtener datos actuales del producto
         $stmt = $conn->prepare("SELECT cantidad, stock_minimo, fecha_caducidad FROM productos WHERE id_producto = ?");
@@ -49,7 +50,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 stock_minimo = :stock_minimo,
                 fecha_caducidad = :fecha_caducidad,
                 ubicacion = :ubicacion,
-                proveedor = :proveedor
+                proveedor = :proveedor,
+                precio = :precio
                 WHERE id_producto = :id";
                 
         $stmt = $conn->prepare($sql);
@@ -62,6 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':fecha_caducidad' => $fecha_caducidad,
             ':ubicacion' => $ubicacion,
             ':proveedor' => $proveedor,
+            ':precio' => $precio,
             ':id' => $id
         ]);
         

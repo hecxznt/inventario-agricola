@@ -1,0 +1,12 @@
+[33m919cf29[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mhector_hugo[m[33m)[m Mejoras en el sistema: - Optimización de envío de correos - Cambio de colores en iconos de estado - Mejoras en la interfaz de usuario
+[33mcad0ee5[m feat: Agregada numeración secuencial a los movimientos
+[33mdc718a1[m feat: Implementar búsqueda avanzada por producto en movimientos
+[33m2fa3517[m feat: Ajustar sistema de alertas - Reducir rango de caducidad a 10 días y ajustar alertas de stock
+[33m33f04c2[m feat: Agregar módulo de alertas con monitoreo de stock bajo, caducidad y movimientos recientes
+[33m2eb99f7[m feat: Implementación de sistema de inventario básico - Agregado módulo de productos con validaciones de stock mínimo - Agregado módulo de movimientos con validaciones de stock - Implementada búsqueda por fechas en movimientos - Agregadas validaciones de stock mínimo (10 unidades) - Mejorada la interfaz de usuario
+[33mcc60227[m[33m ([m[1;32mmaster[m[33m)[m Actualización completa de la sección de movimientos con todos los archivos necesarios
+[33m5567d5b[m Mejoras en la sección de movimientos: implementación de selector de productos y corrección de eventos JavaScript
+[33m0d07c04[m Estado actual de la sección de movimientos antes de rediseñar el formulario
+[33mf4d9998[m Agregada sección de movimientos y mejoras en productos
+[33mb8916c9[m Agregado tema agrícola, cambios en la interfaz y funcionalidad de productos
+[33mc6fc55b[m proyecto inicial
