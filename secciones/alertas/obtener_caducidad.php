@@ -23,32 +23,6 @@ try {
             if ($diferencia->days <= 7) {
                 $estado = 'Crítico';
                 $clase = 'danger';
-                
-                // Verificar si ya se envió una alerta para este producto
-                $stmt_check = $conn->prepare("SELECT COUNT(*) as total FROM alertas_enviadas WHERE id_producto = ? AND tipo_alerta = 'caducidad' AND fecha_alerta >= DATE_SUB(NOW(), INTERVAL 1 DAY)");
-                $stmt_check->execute([$row['id_producto']]);
-                $alerta_enviada = $stmt_check->fetch(PDO::FETCH_ASSOC)['total'];
-                
-                if ($alerta_enviada == 0) {
-                    // Enviar correo de alerta crítica
-                    $asunto = "¡Alerta Crítica! Producto por Caducar";
-                    $mensaje = "
-                        <h2>Alerta de Caducidad</h2>
-                        <p>El siguiente producto está próximo a caducar:</p>
-                        <ul>
-                            <li><strong>Producto:</strong> {$row['nombre']}</li>
-                            <li><strong>Stock Actual:</strong> {$row['cantidad']}</li>
-                            <li><strong>Fecha de Caducidad:</strong> " . date('d/m/Y', strtotime($row['fecha_caducidad'])) . "</li>
-                            <li><strong>Tiempo Restante:</strong> " . ($diferencia->days == 0 ? $diferencia->h . " horas" : $diferencia->days . " días") . "</li>
-                        </ul>
-                        <p>Por favor, tome las medidas necesarias.</p>
-                    ";
-                    enviarCorreoAlerta($asunto, $mensaje, 'industriaagro25@gmail.com');
-                    
-                    // Registrar que se envió la alerta
-                    $stmt_insert = $conn->prepare("INSERT INTO alertas_enviadas (id_producto, tipo_alerta, fecha_alerta) VALUES (?, 'caducidad', NOW())");
-                    $stmt_insert->execute([$row['id_producto']]);
-                }
             } else if ($diferencia->days <= 7) {
                 $estado = 'Próximo';
                 $clase = 'warning';

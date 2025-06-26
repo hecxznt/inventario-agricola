@@ -63,6 +63,54 @@ $(document).ready(function() {
         doc.autoTable({ html: tabla, theme: 'grid', headStyles: { fillColor: [220, 53, 69] } });
         doc.save('datos.pdf');
     });
+
+    // Autocompletado de productos en el modal de nuevo movimiento
+    $('#nuevoMovimientoModal').on('shown.bs.modal', function () {
+        $('#inputProductoAutocomplete').val('').focus();
+        $('#autocompleteResultados').hide();
+    });
+
+    // Crear input de autocompletado si no existe
+    if ($('#inputProductoAutocomplete').length === 0) {
+        $('#producto').parent().prepend('<input type="text" class="form-control mb-2" id="inputProductoAutocomplete" placeholder="Buscar producto..."><div id="autocompleteResultados" class="list-group position-absolute w-100" style="z-index: 2000; display: none;"></div>');
+    }
+
+    // Evento de autocompletado
+    $(document).on('input', '#inputProductoAutocomplete', function() {
+        const query = $(this).val();
+        if (query.length < 1) {
+            $('#autocompleteResultados').hide();
+            return;
+        }
+        $.get('../../secciones/productos/buscar_autocomplete.php', {q: query}, function(data) {
+            if (data.success && data.productos.length > 0) {
+                let html = '';
+                data.productos.forEach(function(prod) {
+                    html += `<a href="#" class="list-group-item list-group-item-action" data-id="${prod.id_producto}" data-nombre="${prod.nombre}">${prod.nombre}</a>`;
+                });
+                $('#autocompleteResultados').html(html).show();
+            } else {
+                $('#autocompleteResultados').hide();
+            }
+        }, 'json');
+    });
+
+    // Selección de producto del autocompletado
+    $(document).on('click', '#autocompleteResultados a', function(e) {
+        e.preventDefault();
+        const id = $(this).data('id');
+        const nombre = $(this).data('nombre');
+        $('#inputProductoAutocomplete').val(nombre);
+        $('#id_producto').val(id);
+        $('#autocompleteResultados').hide();
+    });
+
+    // Al abrir el modal, limpiar autocompletado
+    $('#nuevoMovimientoModal').on('show.bs.modal', function () {
+        $('#inputProductoAutocomplete').val('');
+        $('#id_producto').val('');
+        $('#autocompleteResultados').hide();
+    });
 });
 
 // Variable para almacenar el producto seleccionado
@@ -165,7 +213,7 @@ function cargarMovimientos() {
             id_producto: idProducto
         },
         success: function(response) {
-            $('tbody').html(response);
+            $('#historialMovimientos').html(response);
         },
         error: function(xhr, status, error) {
             console.error('Error al cargar movimientos:', error);
@@ -259,4 +307,31 @@ function eliminarMovimiento(id_movimiento) {
             alert('Error al eliminar movimiento');
         }
     });
-} 
+}
+
+// Función para cambiar de página en la paginación de movimientos
+function cambiarPagina(pagina) {
+    const fechaDesde = $('#fechaDesde').val();
+    const fechaHasta = $('#fechaHasta').val();
+    const idProducto = productoSeleccionado ? productoSeleccionado.id : null;
+
+    $.ajax({
+        url: '../../secciones/movimientos/obtener_historial.php',
+        type: 'GET',
+        data: {
+            fecha_desde: fechaDesde,
+            fecha_hasta: fechaHasta,
+            id_producto: idProducto,
+            pagina: pagina
+        },
+        success: function(response) {
+            $('#historialMovimientos').html(response);
+        },
+        error: function(xhr, status, error) {
+            alert('Error al cambiar de página');
+        }
+    });
+}
+
+window.cambiarPagina = cambiarPagina;
+console.log('cambiarPagina global:', window.cambiarPagina); 

@@ -20,6 +20,12 @@
                     Alertas
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" href="../trabajador/index.php">
+                    <i class="bi bi-person-badge"></i>
+                    Trabajador
+                </a>
+            </li>
         </ul>
     </div>
 </nav> 

@@ -16,30 +16,7 @@ require_once '../../php/config.php';
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
-            <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
-                <div class="position-sticky pt-3">
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link active" href="../productos/index.php">
-                                <i class="bi bi-box-seam"></i> Productos
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="../movimientos/index.php">
-                                <i class="bi bi-arrow-left-right"></i> Movimientos
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="../alertas/index.php">
-                                <i class="bi bi-bell"></i> Alertas
-                                <span id="indicadorAlertas" class="position-relative ms-1" style="display: none;">
-                                    <i class="bi bi-exclamation-triangle-fill text-warning"></i>
-                                </span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
+            <?php include '../includes/sidebar.php'; ?>
 
             <!-- Main content -->
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
@@ -114,7 +91,7 @@ require_once '../../php/config.php';
                             <tbody>
                                 <?php
                                 try {
-                                    $stmt = $conn->query("SELECT id_producto, nombre, categoria, presentacion, cantidad as stock_actual, stock_minimo, fecha_caducidad, ubicacion, proveedor, precio, 1 as activo FROM productos ORDER BY nombre");
+                                    $stmt = $conn->query("SELECT id_producto, nombre, categoria, presentacion, cantidad as stock_actual, stock_minimo, fecha_caducidad, ubicacion, proveedor, precio, activo FROM productos ORDER BY nombre");
                                     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                                         // Formatear la fecha de caducidad
                                         $fechaCaducidad = !empty($row['fecha_caducidad']) ? date('d/m/Y', strtotime($row['fecha_caducidad'])) : '-';
@@ -147,7 +124,12 @@ require_once '../../php/config.php';
                                             <td><?php echo $fechaCaducidad; ?></td>
                                             <td><?php echo htmlspecialchars($row['ubicacion']); ?></td>
                                             <td><?php echo htmlspecialchars($row['proveedor']); ?></td>
-                                            <td><?php echo ($row['categoria'] === 'insumo' && !empty($row['precio'])) ? '$' . number_format($row['precio'], 2) : '-'; ?></td>
+                                            <td><?php
+                                                $categoria = strtolower(trim($row['categoria']));
+                                                echo (($categoria === 'insumo' || $categoria === 'insumos') && !empty($row['precio']))
+                                                    ? '$' . number_format($row['precio'], 2)
+                                                    : '-';
+                                            ?></td>
                                             <td>
                                                 <span class="badge bg-<?php echo $row['activo'] ? 'success' : 'danger'; ?>">
                                                     <?php echo $row['activo'] ? 'Activo' : 'Deshabilitado'; ?>

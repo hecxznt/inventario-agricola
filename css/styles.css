@@ -50,6 +50,9 @@ body {
 
 .sidebar .nav-link i {
     margin-right: 0.5rem;
+    font-size: 1.5rem;
+    color: #fff !important;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.25));
 }
 
 /* Estilos del contenido principal */

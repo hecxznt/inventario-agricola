@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $fecha_caducidad = !empty($_POST['fechaCaducidad']) ? $_POST['fechaCaducidad'] : null;
         $ubicacion = $_POST['ubicacion'];
         $proveedor = $_POST['proveedor'];
-        $precio = (isset($_POST['precio']) && $categoria === 'insumo') ? floatval($_POST['precio']) : null;
+        $precio = (isset($_POST['precio']) && ($categoria === 'insumo' || $categoria === 'insumos')) ? floatval($_POST['precio']) : null;
 
         // Validar datos
         if (empty($nombre) || empty($categoria) || empty($presentacion) || empty($cantidad) || empty($stock_minimo) || empty($ubicacion) || empty($proveedor)) {

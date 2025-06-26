@@ -18,32 +18,27 @@ function verificarYEnviarAlertas() {
         
         $alertasCaducidad = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
+        // --- ALERTAS DE CADUCIDAD ---
+        $productosCaducidad = [];
         foreach ($alertasCaducidad as $alerta) {
-            $fechaCaducidad = new DateTime($alerta['fecha_caducidad']);
-            $hoy = new DateTime();
-            $diferencia = $hoy->diff($fechaCaducidad);
-            
-            // Preparar el mensaje según el tiempo restante
-            if ($diferencia->days == 0) {
-                $tiempoRestante = $diferencia->h . " horas";
-            } else {
-                $tiempoRestante = $diferencia->days . " días";
+            // Intentar insertar la bandera primero
+            $stmt_insert = $conn->prepare("INSERT IGNORE INTO alertas_enviadas (id_producto, tipo_alerta, fecha_alerta) VALUES (?, 'caducidad', NOW())");
+            $inserted = $stmt_insert->execute([$alerta['id_producto']]);
+            if ($stmt_insert->rowCount() > 0) {
+                $productosCaducidad[] = $alerta;
             }
-            
-            $asunto = "¡Alerta Crítica! Producto por Caducar";
-            $mensaje = "
-                <h2>Alerta de Caducidad</h2>
-                <p>El siguiente producto está próximo a caducar:</p>
-                <ul>
-                    <li><strong>Producto:</strong> {$alerta['nombre']}</li>
-                    <li><strong>Stock Actual:</strong> {$alerta['cantidad']}</li>
-                    <li><strong>Fecha de Caducidad:</strong> " . date('d/m/Y', strtotime($alerta['fecha_caducidad'])) . "</li>
-                    <li><strong>Tiempo Restante:</strong> {$tiempoRestante}</li>
-                </ul>
-                <p>Por favor, tome las medidas necesarias.</p>
-            ";
-            
-            // Enviar correo directamente
+        }
+        if (count($productosCaducidad) > 0) {
+            $mensaje = "<h2>Alerta de Caducidad</h2><p>Los siguientes productos están próximos a caducar:</p><ul>";
+            foreach ($productosCaducidad as $alerta) {
+                $fechaCaducidad = new DateTime($alerta['fecha_caducidad']);
+                $hoy = new DateTime();
+                $diferencia = $hoy->diff($fechaCaducidad);
+                $tiempoRestante = ($diferencia->days == 0) ? $diferencia->h . " horas" : $diferencia->days . " días";
+                $mensaje .= "<li><strong>Producto:</strong> {$alerta['nombre']} | <strong>Stock Actual:</strong> {$alerta['cantidad']} | <strong>Fecha de Caducidad:</strong> " . date('d/m/Y', strtotime($alerta['fecha_caducidad'])) . " | <strong>Tiempo Restante:</strong> {$tiempoRestante}</li>";
+            }
+            $mensaje .= "</ul><p>Por favor, tome las medidas necesarias.</p>";
+            $asunto = "¡Alerta Crítica! Productos por Caducar";
             enviarCorreoAlerta($asunto, $mensaje, 'industriaagro25@gmail.com');
         }
 
@@ -57,20 +52,22 @@ function verificarYEnviarAlertas() {
         
         $alertasStock = $stmt->fetchAll(PDO::FETCH_ASSOC);
         
+        // --- ALERTAS DE STOCK ---
+        $productosStock = [];
         foreach ($alertasStock as $alerta) {
-            $asunto = "¡Alerta Crítica! Stock Mínimo Alcanzado";
-            $mensaje = "
-                <h2>Alerta de Stock Mínimo</h2>
-                <p>El siguiente producto ha alcanzado su stock mínimo:</p>
-                <ul>
-                    <li><strong>Producto:</strong> {$alerta['nombre']}</li>
-                    <li><strong>Stock Actual:</strong> {$alerta['cantidad']}</li>
-                    <li><strong>Stock Mínimo:</strong> {$alerta['stock_minimo']}</li>
-                </ul>
-                <p>Por favor, realice un nuevo pedido para reponer el inventario.</p>
-            ";
-            
-            // Enviar correo directamente
+            $stmt_insert = $conn->prepare("INSERT IGNORE INTO alertas_enviadas (id_producto, tipo_alerta, fecha_alerta) VALUES (?, 'stock', NOW())");
+            $inserted = $stmt_insert->execute([$alerta['id_producto']]);
+            if ($stmt_insert->rowCount() > 0) {
+                $productosStock[] = $alerta;
+            }
+        }
+        if (count($productosStock) > 0) {
+            $mensaje = "<h2>Alerta de Stock Mínimo</h2><p>Los siguientes productos han alcanzado su stock mínimo:</p><ul>";
+            foreach ($productosStock as $alerta) {
+                $mensaje .= "<li><strong>Producto:</strong> {$alerta['nombre']} | <strong>Stock Actual:</strong> {$alerta['cantidad']} | <strong>Stock Mínimo:</strong> {$alerta['stock_minimo']}</li>";
+            }
+            $mensaje .= "</ul><p>Por favor, realice un nuevo pedido para reponer el inventario.</p>";
+            $asunto = "¡Alerta Crítica! Productos con Stock Mínimo";
             enviarCorreoAlerta($asunto, $mensaje, 'industriaagro25@gmail.com');
         }
         
