@@ -158,7 +158,7 @@
                                     <div class="row mb-3">
                                         <div class="col-md-4">
                                             <label for="tel" class="form-label">Teléfono</label>
-                                            <input type="text" class="form-control" id="tel" name="tel">
+                                            <input type="number" class="form-control" id="tel" name="tel" min="0" pattern="[0-9]+" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
                                         </div>
                                         <div class="col-md-4">
                                             <label for="email" class="form-label">Email</label>
@@ -166,7 +166,8 @@
                                         </div>
                                         <div class="col-md-4">
                                             <label for="cargo" class="form-label">Cargo</label>
-                                            <select class="form-select" id="cargo" name="cargo" size="4" style="overflow-y:auto;" required>
+                                            <select class="form-select" id="cargo" name="cargo" required>
+                                                <option value="">Selecciona un cargo</option>
                                                 <option value="jornalero">Jornalero</option>
                                                 <option value="capataz">Capataz</option>
                                                 <option value="vigilante">Vigilante</option>
