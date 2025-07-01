@@ -13,6 +13,7 @@ require_once '../../php/config.php';
     <link rel="stylesheet" href="/inventario/css/styles.css?v=1.0">
 </head>
 <body>
+    <?php include '../../php/navbar.php'; ?>
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->

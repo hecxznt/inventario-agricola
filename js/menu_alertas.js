@@ -15,6 +15,7 @@ function verificarAlertas() {
                 `).show();
             } else {
                 indicador.hide();
+                indicador.html("");
             }
         },
         error: function(xhr, status, error) {

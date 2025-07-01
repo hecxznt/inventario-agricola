@@ -33,6 +33,9 @@
                 </li>
             </ul>
             <ul class="navbar-nav ms-auto">
+                <li class="nav-item d-flex align-items-center me-2">
+                    <div id="indicadorAlertas" style="position: relative; display: none;"></div>
+                </li>
                 <li class="nav-item">
                     <a class="nav-link" href="../../php/cerrar_sesion.php">
                         <i class="bi bi-box-arrow-right"></i> Cerrar Sesión

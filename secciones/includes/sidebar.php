@@ -15,9 +15,10 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="../alertas/index.php">
+                <a class="nav-link d-flex align-items-center position-relative" href="../alertas/index.php">
                     <i class="bi bi-exclamation-triangle"></i>
-                    Alertas
+                    <span class="ms-2">Alertas</span>
+                    <div id="indicadorAlertas" style="position: absolute; right: 10px; display: none;"></div>
                 </a>
             </li>
             <li class="nav-item">
