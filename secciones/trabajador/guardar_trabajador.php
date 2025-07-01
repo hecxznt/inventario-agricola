@@ -43,11 +43,11 @@ try {
     }
 
     $sql = "INSERT INTO trabajador (
-        id_trabajador, nombre, apellido_paterno, apellido_materno, genero, fecha_nacimiento, foto, nss, curp, calleynum, colonia, municipio, estado, cp, tel, email, cargo, fecha_ingreso, fecha_registro, salario_diario
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        nombre, apellido_paterno, apellido_materno, genero, fecha_nacimiento, foto, nss, curp, calleynum, colonia, municipio, estado, cp, tel, email, cargo, fecha_ingreso, fecha_registro, salario_diario
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
     $stmt->execute([
-        $id_trabajador, $nombre, $apellido_paterno, $apellido_materno, $genero, $fecha_nacimiento, $foto_nombre, $nss, $curp, $calleynum, $colonia, $municipio, $estado, $cp, $tel, $email, $cargo, $fecha_ingreso, $fecha_registro, $salario_diario
+        $nombre, $apellido_paterno, $apellido_materno, $genero, $fecha_nacimiento, $foto_nombre, $nss, $curp, $calleynum, $colonia, $municipio, $estado, $cp, $tel, $email, $cargo, $fecha_ingreso, $fecha_registro, $salario_diario
     ]);
 
     echo json_encode(['success' => true, 'message' => 'Trabajador guardado correctamente']);

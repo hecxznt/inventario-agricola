@@ -13,7 +13,6 @@
     <link rel="stylesheet" href="/inventario/css/styles.css?v=1.0">
 </head>
 <body>
-    <?php include '../../php/navbar.php'; ?>
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
@@ -87,10 +86,6 @@
                                 <form id="formNuevoTrabajador" enctype="multipart/form-data">
                                     <div class="row mb-3">
                                         <div class="col-md-4">
-                                            <label for="id_trabajador" class="form-label">ID Trabajador</label>
-                                            <input type="text" class="form-control" id="id_trabajador" name="id_trabajador" required>
-                                        </div>
-                                        <div class="col-md-4">
                                             <label for="nombre" class="form-label">Nombre</label>
                                             <input type="text" class="form-control" id="nombre" name="nombre" required>
                                         </div>
@@ -98,12 +93,12 @@
                                             <label for="apellido_paterno" class="form-label">Apellido Paterno</label>
                                             <input type="text" class="form-control" id="apellido_paterno" name="apellido_paterno" required>
                                         </div>
-                                    </div>
-                                    <div class="row mb-3">
                                         <div class="col-md-4">
                                             <label for="apellido_materno" class="form-label">Apellido Materno</label>
                                             <input type="text" class="form-control" id="apellido_materno" name="apellido_materno">
                                         </div>
+                                    </div>
+                                    <div class="row mb-3">
                                         <div class="col-md-4">
                                             <label for="genero" class="form-label">Género</label>
                                             <select class="form-select" id="genero" name="genero" required>
@@ -243,7 +238,6 @@
                     cargarTrabajadores();
                     modoEdicion = false;
                     idTrabajadorEditando = null;
-                    document.getElementById('id_trabajador').removeAttribute('readonly');
                     document.getElementById('modalNuevoTrabajadorLabel').textContent = 'Nuevo Trabajador';
                 } else {
                     alert(data.message || 'Error al guardar trabajador');
@@ -336,8 +330,6 @@
             document.getElementById('modalNuevoTrabajadorLabel').textContent = 'Editar Trabajador';
             const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modalNuevoTrabajador'));
             modal.show();
-            document.getElementById('id_trabajador').value = trabajador.id_trabajador;
-            document.getElementById('id_trabajador').setAttribute('readonly', 'readonly');
             document.getElementById('nombre').value = trabajador.nombre;
             document.getElementById('apellido_paterno').value = trabajador.apellido_paterno;
             document.getElementById('apellido_materno').value = trabajador.apellido_materno;
