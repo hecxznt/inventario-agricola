@@ -11,6 +11,32 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="/inventario/css/styles.css?v=1.0">
+    <style>
+    /* Reducir el tamaño de la tabla de nómina semanal y centrarla, con un pequeño margen a la izquierda */
+    #tabla-nomina th, #tabla-nomina td {
+        padding: 0.2rem 0.3rem !important;
+        font-size: 0.90rem;
+        text-align: center;
+        vertical-align: middle;
+    }
+    #tabla-nomina input[type="number"] {
+        width: 60px;
+        padding: 0.05rem 0.1rem;
+        font-size: 0.90rem;
+        text-align: right;
+        margin: 0 auto;
+    }
+    #tabla-nomina {
+        width: 100%;
+        max-width: 630px;
+        margin: 0 auto;
+    }
+    .card-body > .table-responsive {
+        padding: 0;
+        margin: 0;
+        display: block;
+    }
+    </style>
 </head>
 <body>
     <div class="container-fluid">
